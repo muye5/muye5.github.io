@@ -1,0 +1,436 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Forecast Gender Based On Item Viewing History | Muye Note</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="muyepiaozhou">
+    
+
+    
+    <meta name="description" content="1. Competition Link.1https://knowledgepit.fedcsis.org/contest/view.php?id=107">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Forecast Gender Based On Item Viewing History">
+<meta property="og:url" content="http://muye5.github.io/2015/05/09/Forecast-Gender-Based-On-Item-Viewing-History/index.html">
+<meta property="og:site_name" content="Muye Note">
+<meta property="og:description" content="1. Competition Link.1https://knowledgepit.fedcsis.org/contest/view.php?id=107">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Forecast Gender Based On Item Viewing History">
+<meta name="twitter:description" content="1. Competition Link.1https://knowledgepit.fedcsis.org/contest/view.php?id=107">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Muye Note" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Muye Note" title="Muye Note"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Muye Note">Muye Note</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:muye5.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/05/09/Forecast-Gender-Based-On-Item-Viewing-History/" title="Forecast Gender Based On Item Viewing History" itemprop="url">Forecast Gender Based On Item Viewing History</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="muyepiaozhou" target="_blank" itemprop="author">muyepiaozhou</a>
+		
+  <p class="article-time">
+    <time datetime="2015-05-09T09:19:04.000Z" itemprop="datePublished"> 發表於 2015-05-09</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Competition_Link-"><span class="toc-number">1.</span> <span class="toc-text">1. Competition Link.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Train_Data_Format-"><span class="toc-number">2.</span> <span class="toc-text">2. Train Data Format.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Feature_Engineering-"><span class="toc-number">3.</span> <span class="toc-text">3. Feature Engineering.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_Translate_Ttem_To_Id-"><span class="toc-number">4.</span> <span class="toc-text">4. Translate Ttem To Id.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_Train_Model_With_Scikit-Learn-"><span class="toc-number">5.</span> <span class="toc-text">5. Train Model With Scikit-Learn.</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="1-_Competition_Link-"><strong>1. Competition Link.</strong></h3><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="label">https:</span>//knowledgepit.fedcsis<span class="preprocessor">.org</span>/contest/view.php?id=<span class="number">107</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h3 id="2-_Train_Data_Format-"><strong>2. Train Data Format.</strong></h3><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gender,session-<span class="property">id</span>,start_time,<span class="keyword">end</span>-<span class="property">time</span>,viewed-<span class="property">item</span>-<span class="type">list</span></span><br><span class="line">female,u10005,<span class="number">2014</span>-<span class="number">11</span>-<span class="number">14</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">08</span>,<span class="number">2014</span>-<span class="number">11</span>-<span class="number">14</span> <span class="number">00</span>:<span class="number">29</span>:<span class="number">25</span>,A00002/B00002/C00003/D00033/;A00002/B00002/C00007/D00035/</span><br></pre></td></tr></table></figure>
+<p>ps. 商品列表按真实浏览次序排列，每件商品具有四层类别属性</p>
+<h3 id="3-_Feature_Engineering-"><strong>3. Feature Engineering.</strong></h3><p>简单构造如下特征：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="property">year</span>,<span class="property">month</span>,<span class="property">day</span>,hour,duration-seconds,<span class="property">item</span>-<span class="type">number</span>,cate-A,cate-B,cate-C,cate-D</span><br></pre></td></tr></table></figure>
+<h3 id="4-_Translate_Ttem_To_Id-"><strong>4. Translate Ttem To Id.</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_data</span><span class="params">(data_file)</span>:</span></span><br><span class="line">    data = []</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> open(data_file):</span><br><span class="line">        terms = line.strip().split(<span class="string">','</span>)</span><br><span class="line">        data.append(terms)</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">id_hash</span><span class="params">(data)</span>:</span></span><br><span class="line">    cate_set_A = set([])</span><br><span class="line">    cate_set_B = set([])</span><br><span class="line">    cate_set_C = set([])</span><br><span class="line">    cate_set_D = set([])</span><br><span class="line">    <span class="keyword">for</span> terms <span class="keyword">in</span> data:</span><br><span class="line">        item_list = terms[<span class="number">4</span>].strip().split(<span class="string">';'</span>)</span><br><span class="line">        <span class="keyword">for</span> item <span class="keyword">in</span> item_list:</span><br><span class="line">            cate_list = item.strip(<span class="string">'/'</span>).split(<span class="string">'/'</span>)</span><br><span class="line">            cate_set_A.add(<span class="string">'/'</span>.join(cate_list[:<span class="number">1</span>]))</span><br><span class="line">            cate_set_B.add(<span class="string">'/'</span>.join(cate_list[:<span class="number">2</span>]))</span><br><span class="line">            cate_set_C.add(<span class="string">'/'</span>.join(cate_list[:<span class="number">3</span>]))</span><br><span class="line">            cate_set_D.add(<span class="string">'/'</span>.join(cate_list[:<span class="number">4</span>]))</span><br><span class="line">    <span class="keyword">return</span> [cate_set_A, cate_set_B, cate_set_C, cate_set_D]</span><br></pre></td></tr></table></figure>
+<h3 id="5-_Train_Model_With_Scikit-Learn-"><strong>5. Train Model With <em>Scikit-Learn</em>.</strong></h3><ul>
+<li><p>由于男女数据不均衡，首先对男性数据进行重采样来平衡正负样本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 0:male, 1:female, X, Y: np.array</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">resample</span><span class="params">(X, Y)</span>:</span> </span><br><span class="line">    idx_0 = np.where(Y == <span class="number">0</span>)[<span class="number">0</span>]</span><br><span class="line">    idx_1 = np.where(Y == <span class="number">1</span>)[<span class="number">0</span>]</span><br><span class="line">    duplicate_idx_0 = np.random.choice(idx_0, idx_1.shape[<span class="number">0</span>] - idx_0.shape[<span class="number">0</span>])</span><br><span class="line">    X = np.concatenate((X, X[duplicate_idx_0]))</span><br><span class="line">    Y = np.concatenate((Y, np.array([<span class="number">0</span>] * (n_1 - n_0))))</span><br><span class="line">    <span class="keyword">return</span> X, Y</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由于比赛的评测标准是采用男女平均正确率，所以需要定义自己的损失函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_loss_func</span><span class="params">(Y, PredY)</span>:</span></span><br><span class="line">    idx_0 = np.where(Y == <span class="number">0</span>)[<span class="number">0</span>]</span><br><span class="line">    idx_1 = np.where(Y == <span class="number">1</span>)[<span class="number">0</span>]</span><br><span class="line">    score_0 = float(np.sum(PredY[idx_0] == <span class="number">0</span>)) / len(idx_0)</span><br><span class="line">    score_1 = float(np.sum(PredY[idx_1] == <span class="number">1</span>)) / len(idx_1)</span><br><span class="line">    <span class="keyword">return</span> (score_0 + score_1) / <span class="number">2</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用自定义的损失函数通过网格搜索筛选GBDT的参数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> make_scorer</span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parameter_search</span><span class="params">(X, Y)</span>:</span></span><br><span class="line">    my_score_func = make_scorer(my_loss_func, greater_is_better=<span class="keyword">True</span>)</span><br><span class="line">    param_grid = &#123;</span><br><span class="line">    	<span class="string">'learning_rate'</span>: [<span class="number">0.1</span>, <span class="number">0.05</span>, <span class="number">0.01</span>],</span><br><span class="line">        <span class="string">'max_depth'</span>: [<span class="number">5</span>, <span class="number">10</span>, <span class="number">15</span>],</span><br><span class="line">        <span class="string">'min_samples_leaf'</span>: [<span class="number">3</span>, <span class="number">5</span>, <span class="number">10</span>],</span><br><span class="line">    &#125;</span><br><span class="line">    est = ensemble.GradientBoostingClassifier(n_estimators=<span class="number">500</span>)</span><br><span class="line">    clf = GridSearchCV(est, param_grid, n_jobs=<span class="number">12</span>, scoring=my_score_func).fit(X, Y)</span><br><span class="line">    avg_prec = my_loss_func(Y, clf.predict(X))</span><br><span class="line">    <span class="keyword">print</span> &gt;&gt; sys.stdout, <span class="string">'avg_prec = %f'</span> % avg_prec</span><br><span class="line">    <span class="keyword">print</span> &gt;&gt; sys.stdout, <span class="string">'best parameters:\n%s'</span> % clf.best_params_</span><br><span class="line">    sys.stdout.flush()</span><br><span class="line">    <span class="keyword">return</span> clf.best_params_</span><br></pre></td></tr></table></figure>
+<p>  最终筛选出 learning_rate = 0.05; max_depth = 15; min_samples_leaf = 5;</p>
+</li>
+<li><p>通过Cross Validation筛选数的个数</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CV2</span><span class="params">(X, Y, best_params)</span>:</span></span><br><span class="line">    <span class="comment"># validation data split</span></span><br><span class="line">    idx_split_list = StratifiedShuffleSplit(Y, n_iter=<span class="number">3</span>, test_size=<span class="number">0.3</span>)</span><br><span class="line">    <span class="keyword">for</span> i, (train_index, test_index) <span class="keyword">in</span> enumerate(idx_split_list):</span><br><span class="line">    	X_train, X_test = X[train_index], X[test_index]</span><br><span class="line">        Y_train, Y_test = Y[train_index], Y[test_index]</span><br><span class="line">        train_error_list = []</span><br><span class="line">        validation_error_list = []</span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">10</span>, <span class="number">501</span>, <span class="number">10</span>):</span><br><span class="line">        	clf = ensemble.GradientBoostingClassifier(n_estimators=k,</span><br><span class="line">                	learning_rate=best_params[<span class="string">'learning_rate'</span>],</span><br><span class="line">                	max_depth=best_params[<span class="string">'max_depth'</span>],</span><br><span class="line">                	min_samples_leaf=best_params[<span class="string">'min_samples_leaf'</span>])</span><br><span class="line">        	clf.fit(X_train, Y_train)</span><br><span class="line">        	train_error_list.append(</span><br><span class="line">        	    <span class="number">1.0</span> - my_loss_func(Y_train, clf.predict(X_train)))</span><br><span class="line">        	validation_error_list.append(</span><br><span class="line">        	    <span class="number">1.0</span> - my_loss_func(Y_test, clf.predict(X_test)))</span><br><span class="line"></span><br><span class="line">        <span class="comment"># plot the curve of train and test error</span></span><br><span class="line">        x = range(<span class="number">10</span>, <span class="number">501</span>, <span class="number">10</span>) </span><br><span class="line">        matplotlib.use(<span class="string">'Agg'</span>)</span><br><span class="line">        plt.plot(x, train_error_list, <span class="string">'k'</span>)</span><br><span class="line">        plt.plot(x, validation_error_list, <span class="string">'b'</span>)</span><br><span class="line">        plt.xlabel(<span class="string">'Number of Estimators'</span>, fontsize=<span class="number">18</span>)</span><br><span class="line">        plt.ylabel(<span class="string">'Error'</span>, fontsize=<span class="number">18</span>)</span><br><span class="line">        plt.legend([<span class="string">'Train'</span>, <span class="string">'Validation'</span>], fontsize=<span class="number">18</span>)</span><br><span class="line">        plt.title(<span class="string">'Error vs. Number of Estimators'</span>, fontsize=<span class="number">20</span>)</span><br><span class="line">        plt.savefig(<span class="string">'validation-%d.png'</span> % i)</span><br></pre></td></tr></table></figure>
+<pre><code>最终根据train-<span class="keyword">error</span>和validation-<span class="keyword">error</span>的变化曲线筛选出树的个数等于<span class="number">150</span>
+</code></pre><p>最后利用搜索到的参数训练模型预测即可，我最后得到的正确率是0.78，不算很好，第一名有0.85，不知道怎么做到的.自己很多地方还需要改进，这里仅作简记！</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/kaggle/">kaggle</a><a href="/tags/scikit-learn/">scikit-learn</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://muye5.github.io/2015/05/09/Forecast-Gender-Based-On-Item-Viewing-History/" data-title="Forecast Gender Based On Item Viewing History | Muye Note" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/05/09/hello-world/" title="Hello World">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Hello World</span>
+</a>
+</div>
+
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Competition_Link-"><span class="toc-number">1.</span> <span class="toc-text">1. Competition Link.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Train_Data_Format-"><span class="toc-number">2.</span> <span class="toc-text">2. Train Data Format.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Feature_Engineering-"><span class="toc-number">3.</span> <span class="toc-text">3. Feature Engineering.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_Translate_Ttem_To_Id-"><span class="toc-number">4.</span> <span class="toc-text">4. Translate Ttem To Id.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_Train_Model_With_Scikit-Learn-"><span class="toc-number">5.</span> <span class="toc-text">5. Train Model With Scikit-Learn.</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/scikit-learn/" title="scikit-learn">scikit-learn<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/kaggle/" title="kaggle">kaggle<sup>1</sup></a></li>
+			
+		
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情鏈接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="muyepiaozhou">muyepiaozhou</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
