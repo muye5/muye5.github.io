@@ -96,15 +96,13 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目錄</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Train_Data_Format-"><span class="toc-number">1.</span> <span class="toc-text">1. Train Data Format.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Feature_Engineering-"><span class="toc-number">2.</span> <span class="toc-text">2. Feature Engineering.</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Train_Data_Format-"><span class="toc-number">1.</span> <span class="toc-text">1. Train Data Format.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Feature_Engineering-"><span class="toc-number">2.</span> <span class="toc-text">2. Feature Engineering.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Summery-"><span class="toc-number">3.</span> <span class="toc-text">3. Summery.</span></a></li></ol>
 		
 		</div>
 		
 		<p>关于比赛的介绍和数据格式，参见<a href="/2015/05/09/Forecast-Gender-Based-On-Item-Viewing-History/">Forecast-Gender-Based-On-Item-Viewing-History</a>，这里主要总结一些别人做特征的经验。<br><a id="more"></a></p>
 <h3 id="1-_Train_Data_Format-"><strong>1. Train Data Format.</strong></h3><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gender,session-<span class="property">id</span>,start_time,<span class="keyword">end</span>-<span class="property">time</span>,viewed-<span class="property">item</span>-<span class="type">list</span></span><br><span class="line">female,u10005,<span class="number">2014</span>-<span class="number">11</span>-<span class="number">14</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">08</span>,<span class="number">2014</span>-<span class="number">11</span>-<span class="number">14</span> <span class="number">00</span>:<span class="number">29</span>:<span class="number">25</span>,A00002/B00002/C00003/D00033/;A00002/B00002/C00007/D00035/</span><br></pre></td></tr></table></figure>
-<h3 id="2-_Feature_Engineering-"><strong>2. Feature Engineering.</strong></h3><ul>
-<li><strong>第一名的方案构造的特征如下，以上面的记录为例：</strong></li>
-</ul>
+<h3 id="2-_Feature_Engineering-"><strong>2. Feature Engineering.</strong></h3><p><strong>A. 第一名的方案构造的特征如下，以上面的记录为例：</strong></p>
 <blockquote>
 <ul>
 <li><p><strong>product and category features.</strong></p>
@@ -142,6 +140,26 @@
 <p><img src="/img/2015-06-14-001.png" ,="" class="img-shadow"></p>
 </blockquote>
 </blockquote>
+<p><strong>B. 另一个和第一名比较相似的解决方案：</strong></p>
+<ol>
+<li><p><strong>Time Features.</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">start</span> <span class="keyword">time</span>, <span class="keyword">end</span> <span class="keyword">time</span>, <span class="keyword">day</span>, <span class="keyword">hour</span>, <span class="keyword">weekday</span></span></span><br></pre></td></tr></table></figure>
+<p>还有看到别的方案里时间特征包括是不是周末，以及距离圣诞节附近。</p>
+</li>
+<li><p><strong>Product and Category Features.</strong></p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unigram, bigram, trigram, <span class="literal">full</span><span class="attribute">-level</span>;</span><br></pre></td></tr></table></figure>
+<p>不同层次类别的组合信息大部分方案都用了，只是有的还用了像上面的和时间特征的组合，还有的是与性别特征的组合，但是这类特征在test data上怎么用呢?</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A0002-<span class="tag">label</span>, B0002-<span class="tag">label</span>, ...</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Transferring Features.</strong><br>另一个特征就是在连续浏览的商品之间，比如</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A0002-A0001, B0002-B0005</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Product ID Prefix.</strong><br>关于前缀的这个问题，确实比较诡异，因为这个是跟数据有关系的，就是很多的商品拥有相同的前缀，看到好几个队都用了 <code>level-D</code> 的前缀特征。</p>
+</li>
+</ol>
+<p><strong>C. 还有一个纯Count的方案.</strong></p>
+<p>这个方案比较简单，不过看起来比想象的效果要好，就是根据训练数据统计每个产品的性别得分，这个得分是一个男女个数的加权平均；而每个session又是产品性别得分的加权平均，这里两个加权过程使用同一组权重，具体如下：<br>$$f(product) = N_{male} * W_{male} - N_{female} * W_{female}$$<br>$$f(session) = N_{[f(product) &gt; 0]} * W_{male} - N_{[f(product) &lt; 0]} * W_{female}$$<br>然后设置 $W_{male} = 1$ ，在(0, 1)区间中去试不同$W_{female}$对应的准确率，当<code>f(session) &lt; 0</code>时，表示该人为女性，否则表示为男性，这个想法是有点暴力的，但是作者运用了<code>semi-supervised</code>的思想，对测试数据中，<code>confidence</code>比较高的数据加入到训练数据中重新进行了训练，这个在其他方案里也有用到，就是通过不同的方法，别管是<code>product</code>的相似度还是<code>session</code>的相似度，还是时间上的序列等等来<code>enrich</code>数据，这一点我觉得是比较难的，因为不同的人会找到不同的<code>enrich</code>的方案，而且有些方案我也没太看明白。</p>
+<h3 id="3-_Summery-"><strong>3. Summery.</strong></h3><p>这个比赛还是学到一些东西的，首先就是时间特征的构造，比如年月日星期几这一类，另一个就是一开始我觉得直接将一天的24小时当特征编码会比较稀疏，但是其实看最后的方案大家好像都是这么干的；另一个就是<code>bigram</code>，<code>trigram</code>这类的特征组合，以及加上时间或者label的特征组合；还有一点就是分层结构的数据，可以直接对不同层次的节点直接编码，然后连接在一起后用NFM的方法分解出各个<code>product</code>的特征向量；最后就是<code>semi-supervised</code>的思想，这点之前自己不太会用；</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -191,7 +209,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目錄</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Train_Data_Format-"><span class="toc-number">1.</span> <span class="toc-text">1. Train Data Format.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Feature_Engineering-"><span class="toc-number">2.</span> <span class="toc-text">2. Feature Engineering.</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Train_Data_Format-"><span class="toc-number">1.</span> <span class="toc-text">1. Train Data Format.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Feature_Engineering-"><span class="toc-number">2.</span> <span class="toc-text">2. Feature Engineering.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Summery-"><span class="toc-number">3.</span> <span class="toc-text">3. Summery.</span></a></li></ol>
  
   </div>
 
