@@ -1,0 +1,437 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Digit Recognizer-II | Muye Note</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="muyepiaozhou">
+    
+
+    
+    <meta name="description" content="接着 Digit-Recognizer，之前最好的结果就是 svm 单模型的 0.98 了，下面继续尝试下模型融合的方案，之前采用的的是简单的average voting 或者 weighted average voting，下面尝试下stacking的方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Digit Recognizer-II">
+<meta property="og:url" content="http://muye5.github.io/2015/06/29/Digit-Recognizer-II/index.html">
+<meta property="og:site_name" content="Muye Note">
+<meta property="og:description" content="接着 Digit-Recognizer，之前最好的结果就是 svm 单模型的 0.98 了，下面继续尝试下模型融合的方案，之前采用的的是简单的average voting 或者 weighted average voting，下面尝试下stacking的方法。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Digit Recognizer-II">
+<meta name="twitter:description" content="接着 Digit-Recognizer，之前最好的结果就是 svm 单模型的 0.98 了，下面继续尝试下模型融合的方案，之前采用的的是简单的average voting 或者 weighted average voting，下面尝试下stacking的方法。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Muye Note" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Muye Note" title="Muye Note"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Muye Note">Muye Note</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:muye5.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/06/29/Digit-Recognizer-II/" title="Digit Recognizer-II" itemprop="url">Digit Recognizer-II</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="muyepiaozhou" target="_blank" itemprop="author">muyepiaozhou</a>
+		
+  <p class="article-time">
+    <time datetime="2015-06-29T12:03:05.000Z" itemprop="datePublished"> 發表於 2015-06-29</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Stacking-"><span class="toc-number">1.</span> <span class="toc-text">1. Stacking.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Semi-Supervised-"><span class="toc-number">2.</span> <span class="toc-text">2. Semi-Supervised.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Stacking_Code-"><span class="toc-number">3.</span> <span class="toc-text">3. Stacking Code.</span></a></li></ol>
+		
+		</div>
+		
+		<p>接着 <a href="/2015/05/18/Digit-Recognizer/">Digit-Recognizer</a>，之前最好的结果就是 <code>svm</code> 单模型的 <code>0.98</code> 了，下面继续尝试下模型融合的方案，之前采用的的是简单的<code>average voting</code> 或者 <code>weighted average voting</code>，下面尝试下<code>stacking</code>的方法。<br><a id="more"></a></p>
+<h3 id="1-_Stacking-"><strong>1. Stacking.</strong></h3><p>所谓 <code>stacking</code> 就是将模型叠加起来，将下层多个模型的预测结果作为上层模型的输入进行训练，我这里的结构如下：</p>
+<ul>
+<li><strong>stage-one</strong></li>
+</ul>
+<pre><code><span class="bullet">1. </span>KNN
+<span class="bullet">2. </span>SVC
+<span class="bullet">3. </span>GBM
+<span class="bullet">4. </span>DBN
+<span class="bullet">5. </span>RF
+</code></pre><ul>
+<li><strong>stage-two</strong></li>
+</ul>
+<pre><code><span class="bullet">1. </span>XGB
+</code></pre><p>第一层在预测时，首先将数据分成 <code>5-fold</code>，使用其中四份进行训练，已另一份进行测试；这个 <code>cross 5</code> 回就得到了该模型对训练数据的预测结果；而对原本的预测数据，先使用全量训练数据训练模型再对预测数据进行预测，也可以使用原来训练的5个模型对预测数据的平均值作为预测数据的特征，第二层的训练就可以基于这些值进行训练了，最后的结果其实并不理想，基本上也是 <code>0.98</code> 多一点。</p>
+<p>这里有个问题就是 <code>stacking</code> 有时候不是你某一个模型或者几个模型挺准然后最后融合的结果就好了，他强调的是不同模型之间的variance，其实所谓的ensemble我理解主要也是消除variance的，只是这里没有超过 <code>svm</code> 还是有点失望的。</p>
+<h3 id="2-_Semi-Supervised-"><strong>2. Semi-Supervised.</strong></h3><p>这个思想挺好的，尤其在 <code>label</code> 数据比较少的时候，可以将预测的标签加进来进行训练，具体操作基本是</p>
+<pre><code><span class="bullet">1. </span>用label数据训练一个模型；
+<span class="bullet">2. </span>将训练数据分成K份，对其中K-1份进行预测；
+<span class="bullet">3. </span>将这K-1份数据和原始的训练数据合在一起重新训练；
+<span class="bullet">4. </span>对另一份数据进行预测；
+<span class="bullet">5. </span>迭代对每一份数据进行预测，经过多轮的迭代，预测数据的label基本就稳定了；
+</code></pre><p>只不过我用这种方法也没能提高准确率，也是 <code>0.98</code>，CA！不知道是不是我对 <code>Stacking</code> 和 <code>Semi</code> 理解错了，为鸡毛都没提高呢？</p>
+<h3 id="3-_Stacking_Code-"><strong>3. Stacking Code.</strong></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#! /usr/bin/python</span></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> print_function</span><br><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Process, Queue</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> xgboost <span class="keyword">as</span> xgb</span><br><span class="line"><span class="keyword">from</span> nolearn.dbn <span class="keyword">import</span> DBN</span><br><span class="line"><span class="keyword">from</span> sklearn.base <span class="keyword">import</span> clone</span><br><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br><span class="line"><span class="keyword">from</span> sklearn.neighbors <span class="keyword">import</span> KNeighborsClassifier</span><br><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> RandomForestClassifier</span><br><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> GradientBoostingClassifier</span><br><span class="line"><span class="keyword">from</span> sklearn.cross_validation <span class="keyword">import</span> StratifiedKFold</span><br><span class="line"><span class="keyword">from</span> sklearn.grid_search <span class="keyword">import</span> GridSearchCV</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> classification_report, accuracy_score</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_data</span><span class="params">()</span>:</span></span><br><span class="line">    train = pd.read_csv(<span class="string">'data/train.csv'</span>)</span><br><span class="line">    test = pd.read_csv(<span class="string">'data/test.csv'</span>, index_col=<span class="keyword">False</span>)</span><br><span class="line">    m = train.shape[<span class="number">1</span>]</span><br><span class="line">    features = [<span class="string">'pixel%d'</span> % i <span class="keyword">for</span> i <span class="keyword">in</span> range(m-<span class="number">1</span>)]</span><br><span class="line">    X_train = train.as_matrix(features) / <span class="number">255.0</span></span><br><span class="line">    Y_train = train[<span class="string">'label'</span>]</span><br><span class="line">    X_test = test.as_matrix(features) / <span class="number">255.0</span></span><br><span class="line">    <span class="keyword">return</span> X_train, Y_train, X_test</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">classifier_factory</span><span class="params">()</span>:</span></span><br><span class="line">    clf_list = []</span><br><span class="line">    clf_list.append((<span class="string">'knn'</span>, KNeighborsClassifier() , <span class="keyword">None</span>))</span><br><span class="line">    clf_list.append((<span class="string">'svc'</span>, SVC(C=<span class="number">10</span>, gamma=<span class="number">0.03</span>, probability=<span class="keyword">True</span>) , <span class="keyword">None</span>))</span><br><span class="line">    clf_list.append((<span class="string">'gbc'</span>, GradientBoostingClassifier(n_estimators=<span class="number">500</span>,</span><br><span class="line">        learning_rate=<span class="number">0.1</span>, max_depth=<span class="number">6</span>, min_samples_leaf=<span class="number">10</span>), <span class="keyword">None</span>))</span><br><span class="line">    clf_list.append((<span class="string">'dbn'</span>, DBN([-<span class="number">1</span>, <span class="number">600</span>, -<span class="number">1</span>], learn_rates=.<span class="number">5</span>, learn_rate_decays=<span class="number">0.9</span>,</span><br><span class="line">        epochs=<span class="number">10</span>, dropouts=<span class="number">0</span>), <span class="keyword">None</span>))</span><br><span class="line">    clf_list.append((<span class="string">'rf'</span>, RandomForestClassifier(max_depth=<span class="number">7</span>, n_estimators=<span class="number">500</span>,</span><br><span class="line">        min_samples_leaf=<span class="number">7</span>), <span class="keyword">None</span>))</span><br><span class="line">    <span class="keyword">return</span> clf_list</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stage_1_fit</span><span class="params">(Q, X, Y, X_test, name, clf, param_grid, skf)</span>:</span></span><br><span class="line">    feature_list, label_list = [], []</span><br><span class="line">    <span class="keyword">for</span> train_index, val_index <span class="keyword">in</span> skf:</span><br><span class="line">        X_train, X_val = X[train_index], X[val_index]</span><br><span class="line">        Y_train, Y_val = Y[train_index], Y[val_index]</span><br><span class="line">        est = clone(clf)</span><br><span class="line">        <span class="keyword">if</span> param_grid:</span><br><span class="line">            est = GridSearchCV(est, param_grid, scoring=<span class="string">'accuracy'</span>, n_jobs=-<span class="number">1</span>, cv=<span class="number">5</span>)</span><br><span class="line">        est.fit(X_train, Y_train)</span><br><span class="line">        feature_list.append(est.predict_proba(X_val))</span><br><span class="line">        label_list.append(Y_val)</span><br><span class="line">    train_label = np.concatenate(label_list)</span><br><span class="line">    train_feature = np.concatenate(feature_list)</span><br><span class="line">    <span class="keyword">if</span> param_grid:</span><br><span class="line">        clf = GridSearchCV(clf, param_grid, scoring=<span class="string">'accuracy'</span>, n_jobs=-<span class="number">1</span>, cv=<span class="number">5</span>)</span><br><span class="line">    clf.fit(X_train, Y_train)</span><br><span class="line">    test_feature = clf.predict_proba(X_test)</span><br><span class="line">    df = pd.DataFrame(data=train_feature, index=train_label)</span><br><span class="line">    df.to_csv(<span class="string">'%s_train.feature'</span> % name, header=<span class="keyword">False</span>)</span><br><span class="line">    df = pd.DataFrame(data=test_feature)</span><br><span class="line">    df.to_csv(<span class="string">'%s_test.feature'</span> % name, index=<span class="keyword">False</span>, header=<span class="keyword">False</span>)</span><br><span class="line">    Q.put((<span class="string">'%s_train.feature'</span> % name, <span class="string">'%s_test.feature'</span> % name))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stage_2_fit</span><span class="params">(X, Y, X_test)</span>:</span></span><br><span class="line">    xg_train = xgb.DMatrix(X, label=Y)</span><br><span class="line">    xg_test = xgb.DMatrix(X_test, label=np.zeros((X_test.shape[<span class="number">0</span>], <span class="number">1</span>)))</span><br><span class="line">    param = &#123;<span class="string">'objective'</span>:<span class="string">'multi:softmax'</span>, <span class="string">'eta'</span>:<span class="number">0.1</span>, <span class="string">'max_depth'</span>:<span class="number">7</span>,</span><br><span class="line">            <span class="string">'num_class'</span>:<span class="number">10</span>, <span class="string">'silent'</span>:<span class="number">1</span>, <span class="string">'nthread'</span>:<span class="number">8</span>&#125;</span><br><span class="line">    watchlist = [(xg_train,<span class="string">'train'</span>)]</span><br><span class="line">    num_round = <span class="number">20</span></span><br><span class="line">    bst = xgb.train(param, xg_train, num_round, watchlist)</span><br><span class="line">    Y_pred = bst.predict(xg_test)</span><br><span class="line">    df = pd.DataFrame(data=Y_pred, index=range(<span class="number">1</span>, len(Y_pred) + <span class="number">1</span>))</span><br><span class="line">    df.to_csv(<span class="string">'stacking-result.csv'</span>, header=<span class="keyword">False</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    X_train, Y_train, X_test = load_data()</span><br><span class="line">    Q = Queue()</span><br><span class="line">    proc_list = []</span><br><span class="line">    <span class="comment"># split train data in k folds</span></span><br><span class="line">    skf = StratifiedKFold(Y_train, n_folds=<span class="number">5</span>)</span><br><span class="line">    <span class="keyword">for</span> name, clf, param_grid <span class="keyword">in</span> classifier_factory():</span><br><span class="line">        proc = Process(target=stage_1_fit, args=(Q, X_train, Y_train, X_test, name,</span><br><span class="line">            clf, param_grid, skf))</span><br><span class="line">        proc.start()</span><br><span class="line">        proc_list.append(proc)</span><br><span class="line">    <span class="keyword">for</span> proc <span class="keyword">in</span> proc_list:</span><br><span class="line">        proc.join()</span><br><span class="line">    <span class="comment"># concatenate predictions from multi-models</span></span><br><span class="line">    train_data, test_data = [], []</span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> Q.empty():</span><br><span class="line">        train_feature_file, test_feature_file = Q.get()</span><br><span class="line">        train_feature = pd.read_csv(train_feature_file, header=<span class="keyword">None</span>)</span><br><span class="line">        test_feature = pd.read_csv(test_feature_file, header=<span class="keyword">None</span>, index_col=<span class="keyword">False</span>)</span><br><span class="line">        train_data.append(train_feature[range(<span class="number">1</span>,<span class="number">11</span>)])</span><br><span class="line">        test_data.append(test_feature)</span><br><span class="line">    train_label = train_feature[<span class="number">0</span>]</span><br><span class="line">    train_data = np.concatenate(train_data, axis=<span class="number">1</span>)</span><br><span class="line">    test_data = np.concatenate(test_data, axis=<span class="number">1</span>)</span><br><span class="line">    <span class="comment"># store</span></span><br><span class="line">    df = pd.DataFrame(data=train_data, index=train_label)</span><br><span class="line">    df.to_csv(<span class="string">'train-feature-result.csv'</span>, header=<span class="keyword">False</span>)</span><br><span class="line">    df = pd.DataFrame(data=test_data)</span><br><span class="line">    df.to_csv(<span class="string">'test-feature-result.csv'</span>, index=<span class="keyword">False</span>, header=<span class="keyword">False</span>)</span><br><span class="line">    <span class="comment"># train model based on predictions of stage-one</span></span><br><span class="line">    stage_2_fit(train_data, train_label, test_data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/kaggle/">kaggle</a><a href="/tags/scikit-learn/">scikit-learn</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://muye5.github.io/2015/06/29/Digit-Recognizer-II/" data-title="Digit Recognizer-II | Muye Note" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/06/14/Forecast-Gender-Based-On-Item-Viewing-History-Winner-Solutions/"  title="Forecast Gender Based On Item Viewing History-Winner Solutions">
+ <strong>下一篇：</strong><br/> 
+ <span>Forecast Gender Based On Item Viewing History-Winner Solutions
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Stacking-"><span class="toc-number">1.</span> <span class="toc-text">1. Stacking.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Semi-Supervised-"><span class="toc-number">2.</span> <span class="toc-text">2. Semi-Supervised.</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Stacking_Code-"><span class="toc-number">3.</span> <span class="toc-text">3. Stacking Code.</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/scikit-learn/" title="scikit-learn">scikit-learn<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/kaggle/" title="kaggle">kaggle<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ml/" title="ml">ml<sup>4</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情鏈接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="muyepiaozhou">muyepiaozhou</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
