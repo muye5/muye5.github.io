@@ -103,10 +103,10 @@
 <ul>
 <li><strong>这个NN的功能是实现异或操作</strong></li>
 <li>4个训练样本，3维，最后一维是 <code>bias</code>，输入始终为1；</li>
-<li>网络结构是 <code>(3-4-1)</code>，激活函数是 <code>sigmoid</code> 函数，最后的输出节点也使用了激活函数，有时候最后的输出不再进行sigmoid变换，error的计算会有些不同；</li>
+<li>网络结构是 <code>(3-4-1)</code>，激活函数是 <code>sigmoid</code> 函数，最后的输出节点也使用了激活函数，有时候最后的输出不再进行变换，error的计算会有些不同；</li>
 <li><code>syn0</code> 是输入层到隐层节点的权重矩阵，<code>syn1</code> 是隐层到输出层的权重矩阵，<code>l1</code>是隐层节点的 <code>sigmoid</code> 输出，<code>l2</code> 就是预测结果；</li>
 <li><code>l2_delta</code> 是在对 <code>np.dot(l1, syn1)</code> 求导，其中<code>(l2 * (1 - l2))</code> 来自 <code>sigmoid</code>，<code>l1_delta</code> 是在对 <code>np.dot(X, syn0)</code> 求导；</li>
-<li><code>l1.T.dot(l2_delta)</code> 是对 <code>syn1</code> 求导，<code>X.T.dot(l1_delta)</code> 是对 <code>syn0</code> 求导，应为 <code>syn0</code> 和 <code>X</code> 是一个dot操作，所以求导的时候就直接剩下 <code>X</code> 这个系数了。</li>
+<li><code>l1.T.dot(l2_delta)</code> 是对 <code>syn1</code> 求导，<code>X.T.dot(l1_delta)</code> 是对 <code>syn0</code> 求导，因为 <code>syn0</code> 和 <code>X</code> 是一个dot操作，所以求导的时候就直接剩下 <code>X</code> 这个系数了。</li>
 </ul>
 <p>代码很简练，可能不直观的地方在于那几次转置，画画图就好了，简记。</p>
   
