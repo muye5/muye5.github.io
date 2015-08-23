@@ -1,0 +1,456 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>A Note on the EM | Muye Note</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="muyepiaozhou">
+    
+
+    
+    <meta name="description" content="IntroductionEM算法常用来求解不完整数据或者含有隐变量的最大似然问题，其实数据不完整和含有隐变量是相关的，对含有隐变量的问题我们可以认为数据是不完整的，对缺失了部分观察值的数据而言，我们可以把隐变量和这些数据数据关联起来。(ps.这个怎么关联？我现在觉得其实隐变量就是为了更容易的求解问题硬生生加进来的，隐变量可以把求解原问题变成求解一个退而求其次的局部最优问题，当然有时候局部最优可能就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Note on the EM">
+<meta property="og:url" content="http://muye5.github.io/2015/08/23/A-Note-on-the-EM/index.html">
+<meta property="og:site_name" content="Muye Note">
+<meta property="og:description" content="IntroductionEM算法常用来求解不完整数据或者含有隐变量的最大似然问题，其实数据不完整和含有隐变量是相关的，对含有隐变量的问题我们可以认为数据是不完整的，对缺失了部分观察值的数据而言，我们可以把隐变量和这些数据数据关联起来。(ps.这个怎么关联？我现在觉得其实隐变量就是为了更容易的求解问题硬生生加进来的，隐变量可以把求解原问题变成求解一个退而求其次的局部最优问题，当然有时候局部最优可能就">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="A Note on the EM">
+<meta name="twitter:description" content="IntroductionEM算法常用来求解不完整数据或者含有隐变量的最大似然问题，其实数据不完整和含有隐变量是相关的，对含有隐变量的问题我们可以认为数据是不完整的，对缺失了部分观察值的数据而言，我们可以把隐变量和这些数据数据关联起来。(ps.这个怎么关联？我现在觉得其实隐变量就是为了更容易的求解问题硬生生加进来的，隐变量可以把求解原问题变成求解一个退而求其次的局部最优问题，当然有时候局部最优可能就">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Muye Note" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Muye Note" title="Muye Note"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Muye Note">Muye Note</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:muye5.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/23/A-Note-on-the-EM/" title="A Note on the EM" itemprop="url">A Note on the EM</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="muyepiaozhou" target="_blank" itemprop="author">muyepiaozhou</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-23T03:49:25.000Z" itemprop="datePublished"> 發表於 2015-08-23</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Introduction"><span class="toc-number">1.</span> <span class="toc-text">Introduction</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#A_simple_mixture_unigram_language_model"><span class="toc-number">2.</span> <span class="toc-text">A simple mixture unigram language model</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Incomplete_VS_Complete_Data"><span class="toc-number">3.</span> <span class="toc-text">Incomplete VS Complete Data</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#A_Lower_Bound_of_Likelihood"><span class="toc-number">4.</span> <span class="toc-text">A Lower Bound of Likelihood</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The_General_Procedure_of_EM"><span class="toc-number">5.</span> <span class="toc-text">The General Procedure of EM</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="Introduction"><strong>Introduction</strong></h3><p>EM算法常用来求解不完整数据或者含有隐变量的最大似然问题，其实数据不完整和含有隐变量是相关的，对含有隐变量的问题我们可以认为数据是不完整的，对缺失了部分观察值的数据而言，我们可以把隐变量和这些数据数据关联起来。(ps.这个怎么关联？我现在觉得其实隐变量就是为了更容易的求解问题硬生生加进来的，隐变量可以把求解原问题变成求解一个退而求其次的局部最优问题，当然有时候局部最优可能就是全局最优)<br><a id="more"></a></p>
+<h3 id="A_simple_mixture_unigram_language_model"><strong>A simple mixture unigram language model</strong></h3><p>我们有文档集 $\mathcal{F} = {d_{1},…,d_{k}}$ , 文档从两个多项分布模型产生，一个模型负责产生背景单词，也就是常见单词 p(w|C),另一个就是我们未知的主题模型，负责产生一些具有主题含义的单词 $p(w|\theta_{F})$ ,损失函数定义如下：<br>$$\log \mathbi{L}(\theta_{F}) = \log p(\mathcal{F}|\theta_{F}) = \sum_{i=1}^{k}\sum_{j=1}^{|d_{i}|}\log((1 - \lambda)p(d_{ij}|\theta_{F}) + \lambdap(d_{ij}|C))$$<br>$d_{ij}$ 是文档 $d<em>{i}$ 中的第j个单词，$\lambda$ 是一个经验值，表示背景单词在文档集中占的比例，我们的任务就是估计$p(w|\theta\</em>{F})$。常用的方法就是最大似然，即：<br>\begin{aligned}<br>\widehat{\theta_{F}} = arg_{\theta_{F}}\maxL(\theta_{F}) \\<br>= arg_{\theta_{F}}\max\sum_{i=1}^{k}\sum_{j=1}^{|d_{i}|}\log((1 - \lambda)p(d_{ij}|\theta_{F}) + \lambdap(d_{ij}|C))<br>\end{aligned}<br>等式的右边是一个关于$p(w|\theta_{F})$的函数，我们可以使用任何的优化方法来求出$\widehat{\theta_{F}}$，EM只是其中一种，并且只保证收敛到局部最优，但在这个问题上也是全局最优解，因为可以证明这个似然函数有唯一最大解（ps.话说怎么证明的）</p>
+<h3 id="Incomplete_VS_Complete_Data"><strong>Incomplete VS Complete Data</strong></h3><p>EM的核心思想是通过增加隐变量来扩展原始数据(imcomplete data)，从而得到一个比较容易计算的似然函数(complete data likelihood function)，通过最大化complete data likelihood function的期望来最大化原始数据的似然估计。针对上面的例子，我们引入一个指示变量z，用来标示一个单词是从哪个分布产生的，<br>$$z_{ij} = \left( \begin{array}{cc} 1 &amp; if word d_{ij} is from background \ 0 &amp; others \end{array} \right) $$<br>所以我们的complete data就不仅包含所有的单词，还包含每个单词究竟是从哪个分布产生的这么一个信息，这样就可以简化我们的似然函数，变成如下形式：<br>\begin{aligned}<br>L_{c}(\theta_{F}) = \log p(\mathcal{F}, \mathbf{z} | \theta_{F}) \\<br>= \sum_{i=1}^{k}\sum_{j=1}^{|d_{i}|}[(1 - z_{ij})\log((1 - \lambda) p(d_{ij}|\theta_{F})) + z_{ij}\log(\lambda p(d_{ij}|C))]<br>\end{aligned}<br>注意这里 $L_{c}(\theta_{F})$ 和 $L(\theta_{F})$ 的最大区别是把 $\log$ 里面的加和写到了 $\log$ 外面，因为对于complete data而言，我们已经知道了每个词是从哪个分布产生的了，所以说complete data的似然函数更容易计算，那么 $L_{c}(\theta_{F})$ 和 $L(\theta_{F})$ 的关系是什么呢？<br>$$ L_{c}(\theta_{F})$ = \log p(\mathbi{X}, \mathbi{H} | \theta) = \log p(\mathbi{X} | \theta) + \log p(\mathbi{H} | \mathbi{X}, \theta) = \mathbi{L}(\theta) + \log p(\mathbi{H} | \mathbi{X}, \theta) $$</p>
+<h3 id="A_Lower_Bound_of_Likelihood"><strong>A Lower Bound of Likelihood</strong></h3><p>EM算法的做法是一开始随机初始化一个$\theta^{(0)}$，然后寻找一个更好的$\theta^{(1)}$，一直这样迭代下去，基于上面$L_{c}(\theta)$ 和 $L(\theta)$的关系，我们可以得到下面的推导：<br>$$L(\theta) - L(\theta^{(n)}) = L_{c}(\theta) - L_{c}(\theta^{(n)}) + \log \frac{p(\mathbi{H}|\mathbi{X}, \theta^{(n)}}{p(\mathbi{H}|\mathbi{X}, \theta)}$$<br>最大化$L(\theta)$就等价于最大化$L(\theta) - L(\theta^{(n)})$，由于$\mathbi{H}$是未知的，我们通过对他积分将它拿掉，怎么积分？基于哪个分布积分呢，这里我们基于$p(\mathbi{H}|\mathbi{X}, \theta^{(n)})$，因为这个分布中的参数$\theta^{(n)}$我们是知道的，等式左边和$\mathbi{H}$没有关系，保持不变，所以积分的结果就变成了：<br>$$L(\theta) - L(\theta^{(n)}) = \sum_{\mathbi{H}} L_{c}(\theta) p(\mathbi{H}|\mathbi{X}, \theta^{(n)}) - \sum_{\mathbi{H}} L_{c}(\theta^{(n)}) p(\mathbi{H}|\mathbi{X}, \theta^{(n)}) + \sum_{\mathbi{H}} p(\mathbi{H}|\mathbi{X}, \theta^{(n)}) \log \frac{p(\mathbi{H}|\mathbi{X}, \theta^{(n)}}{p(\mathbi{H}|\mathbi{X}, \theta)}$$<br>公式的最后一项是$p(\mathbi{H}|\mathbi{X}, \theta^{(n)})$和$p(\mathbi{H}|\mathbi{X}, \theta)$的KL-divergence，是一个非负数，所以我们可以得到如下的不等式：<br>$$L(\theta) = \sum_{\mathbi{H}} L_{c}(\theta) p(\mathbi{H}|\mathbi{X}, \theta^{(n)}) + L(\theta^{(n)}) - \sum_{\mathbi{H}} L_{c}(\theta^{(n)}) p(\mathbi{H}|\mathbi{X}, \theta^{(n)})$$<br>这样我们就找到了$L(\theta)$的一个下界，注意不等式右边最后两项和$\theta$没有关系，可以看做是常量，我们的任务就是逐步的提高$\sum_{\mathbi{H}} L_{c}(\theta) p(\mathbi{H}|\mathbi{X}, \theta^{(n)})$的值，这也就是所谓的Q function：<br>$$\mathbi{Q}(\theta, \theta^{(n)}) = \mathbi{E}_{p(\mathbi{H}|\mathbi{X}, \theta^{(n)})}[L_{c}(\theta)] = \sum_{\mathbi{H}} L_{c}(\theta) p(\mathbi{H}|\mathbi{X}, \theta^{(n)})$$<br>我们例子中的Q-function如下：<br>\begin{aligned}<br>\mathbi{Q}(\theta_{F}, \theta_{F}^{(n)}) = \sum_{\mathbf{z}} L_{c}(\theta_{F}) p(\mathbf{z}|F, \theta_{F}^{(n)}) \\<br>= \sum_{i=1}^{k}\sum_{j=1}^{|d_{i}|} [p(z_{ij} = 0 | F, \theta_{F}^{(n)}) \log((1 - \lambda) p(d_{ij}|\theta_{F})) + p(z_{ij} = 1 | F, \theta_{F}^{(n)}) \log(\lambda p(d_{ij}|C))]<br>\end{aligned}</p>
+<h3 id="The_General_Procedure_of_EM"><strong>The General Procedure of EM</strong></h3><p>EM分两步，第一步是计算Q-function，那么到底是计算什么呢，其实就是计算$p(\mathbi{H}|\mathbi{X}, \theta^{(n)})$，就是隐变量的条件分布，基于$\mathbi{X}$和$\theta^{(n)}$的后验分布；第二部就是最大化Q-function，从而得到新的$\theta$，在我们的例子中：<br> $$p(z_{ij} = 1 | F, \theta_{F}^{(n)}) = \frac{\lambda p(d_{ij}|C)}{\lambda p(d_{ij}|C) + (1 - \lambda) p(d_{ij}|\theta_{F}^{(n)})}$$<br> 带入我们就可以得到Q-function的一个关于$p(w|\theta_{F})$的函数，接下来是最大化Q-function，这里对$p(w|\theta_{F})$还有一个约束，就是:<br> $$\sum_{w\in\mathbf{V}}p(w|\theta_{F}) = 1$$<br> 下一步就是利用拉格朗日变换，再求导，另导数等于0，从而得到：<br> \begin{aligned}<br> p(w|\theta_{F}) = \frac{\sum_{i = 1}^{k}\sum_{j = 1, d_{ij} = w}^{|d_{i}|} p(z_{ij} = 0 | F, \theta_{F}^{(n)})}{\sum_{i = 1}^{k}\sum_{j = 1}^{|d_{i}|} p(z_{ij} = 0 | F, \theta_{F}^{(n)})} \\<br> \frac{\sum_{i = 1}^{k} p(z_{w} = 0 | F, \theta_{F}^{(n)}) c(w, d_{i})} {\sum_{i = 1}^{k}\sum_{w \in V} p(z_{w} = 0 | F, \theta_{F}^{(n)}) c(w, d_{i})}<br> \end{aligned}<br>所以我们在E步求的是隐变量的后验分布：<br>$$p(z_{w} = 1 | F, \theta_{F}^{(n)}) = \frac{\lambda p(w|C)}{\lambda p(w|C) + (1 - \lambda) p(w|\theta_{F}^{(n)})}$$<br>在M步通过求导解出来$p(w|\theta_{F})$,带入到隐变量后验分布的公式中，就可以得到隐变量新的后验分布，就这样迭代下去直到收敛。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ml/">ml</a><a href="/tags/note/">note</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://muye5.github.io/2015/08/23/A-Note-on-the-EM/" data-title="A Note on the EM | Muye Note" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/07/20/Neural-Network-in-11-Python-Code/"  title="Neural Network in 11 Python Code">
+ <strong>下一篇：</strong><br/> 
+ <span>Neural Network in 11 Python Code
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Introduction"><span class="toc-number">1.</span> <span class="toc-text">Introduction</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#A_simple_mixture_unigram_language_model"><span class="toc-number">2.</span> <span class="toc-text">A simple mixture unigram language model</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Incomplete_VS_Complete_Data"><span class="toc-number">3.</span> <span class="toc-text">Incomplete VS Complete Data</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#A_Lower_Bound_of_Likelihood"><span class="toc-number">4.</span> <span class="toc-text">A Lower Bound of Likelihood</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#The_General_Procedure_of_EM"><span class="toc-number">5.</span> <span class="toc-text">The General Procedure of EM</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/ml/" title="ml">ml<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/scikit-learn/" title="scikit-learn">scikit-learn<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/kaggle/" title="kaggle">kaggle<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/note/" title="note">note<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情鏈接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="muyepiaozhou">muyepiaozhou</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
