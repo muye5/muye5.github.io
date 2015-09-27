@@ -1,0 +1,496 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>A Note on the LDA | Muye Note</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="muyepiaozhou">
+    
+
+    
+    <meta name="description" content="1. 前言本文主要参考《LDA漫游指南》，写的非常好，建议读一读，这里做一个简单的笔记。关于LDA (Latent Dirichlet Allocation)，主要涉及Gamma函数、二项分布、共轭分布、Dirichlet分布、EM算法、Gibbs采样 这几个概念，人物主要涉及欧拉(Gamma函数)、Dirichlet(Dirichlet分布)和Blei(LDA)，LDA最初是通过EM算法来求解的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Note on the LDA">
+<meta property="og:url" content="http://muye5.github.io/2015/09/06/A-Note-on-the-LDA/index.html">
+<meta property="og:site_name" content="Muye Note">
+<meta property="og:description" content="1. 前言本文主要参考《LDA漫游指南》，写的非常好，建议读一读，这里做一个简单的笔记。关于LDA (Latent Dirichlet Allocation)，主要涉及Gamma函数、二项分布、共轭分布、Dirichlet分布、EM算法、Gibbs采样 这几个概念，人物主要涉及欧拉(Gamma函数)、Dirichlet(Dirichlet分布)和Blei(LDA)，LDA最初是通过EM算法来求解的">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="A Note on the LDA">
+<meta name="twitter:description" content="1. 前言本文主要参考《LDA漫游指南》，写的非常好，建议读一读，这里做一个简单的笔记。关于LDA (Latent Dirichlet Allocation)，主要涉及Gamma函数、二项分布、共轭分布、Dirichlet分布、EM算法、Gibbs采样 这几个概念，人物主要涉及欧拉(Gamma函数)、Dirichlet(Dirichlet分布)和Blei(LDA)，LDA最初是通过EM算法来求解的">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Muye Note" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Muye Note" title="Muye Note"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Muye Note">Muye Note</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:muye5.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/09/06/A-Note-on-the-LDA/" title="A Note on the LDA" itemprop="url">A Note on the LDA</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="muyepiaozhou" target="_blank" itemprop="author">muyepiaozhou</a>
+		
+  <p class="article-time">
+    <time datetime="2015-09-06T12:24:05.000Z" itemprop="datePublished"> 發表於 2015-09-06</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_前言"><span class="toc-number">1.</span> <span class="toc-text">1. 前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_函数"><span class="toc-number">2.</span> <span class="toc-text">2. 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_LDA_推导"><span class="toc-number">3.</span> <span class="toc-text">3. LDA 推导</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_Gibbs_Sampling"><span class="toc-number">4.</span> <span class="toc-text">4. Gibbs Sampling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_Gibbs_LDA++_Code"><span class="toc-number">5.</span> <span class="toc-text">5. Gibbs LDA++ Code</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="1-_前言">1. <strong>前言</strong></h3><p>本文主要参考《LDA漫游指南》，写的非常好，建议读一读，这里做一个简单的笔记。关于LDA (Latent Dirichlet Allocation)，主要涉及Gamma函数、二项分布、共轭分布、Dirichlet分布、EM算法、Gibbs采样 这几个概念，人物主要涉及欧拉(Gamma函数)、Dirichlet(Dirichlet分布)和Blei(LDA)，LDA最初是通过EM算法来求解的，比较复杂，后来发明了Collapsed Gibbs Sampling方法，LDA的过程如下：<br><a id="more"></a></p>
+<ul>
+<li>对每篇文档，从主题分布中抽取一个主题；</li>
+<li>从该主题对应的单词分布中抽取一个单词；</li>
+<li>重复上述过程直至遍历文档中每一个单词。</li>
+</ul>
+<p>LDA认为每篇文档包含若干个主题，这些主题在每篇文档中服从多项分布，而这些主题本身又服从Dirichlet的先验分布；为什么是Dirichlet分布，因为它跟多项分布是共轭的，共轭有什么好处？如果我们知道一个变量带参数的分布函数，又有了这个变量的一些样本数据，我们就可以通过最大似然来估计这个分布函数的参数，而如果我们再知道这个变量服从什么用的先验分布，我们可以通过贝叶斯公式求出它的后验分布，通过最大化后验分布来求解参数。那么共轭有什么好处呢？一对共轭分布函数相乘得到的结果还是其中一个分布的形式。具体到LDA，就是主题在一篇文档中服从多项分布，主题本身服从Dirchlet的先验分布，乘起来得到的后验分布还是Dirichlet分布，这样就可以形成一个环，把后验分布再当成新的先验分布。</p>
+<p>另一个问题，在一篇文档中，服从多项分布的主题是怎么体现的？这个主题其实我们观测不到，这也是latent的含义，我们能看到的就是一篇文档还有文档中的一个个单词，主题就是附在单词身上的，每一个单词对应一个主题，更准确的说是每一个位置对应一个主题，这里的单词不是Word Vocabulary中的那些去重的单词，而是文档中一个个的slot，一篇文档长200，它就包含200个slot，每个slot都有一个自己的主题，至于说这篇文档究竟含有一个去重的单词，我们是不关心的，我们关心的是当前slot下，我该从Word Vocabulary中选哪一个单词填进来？怎么决定填入哪一个单词呢？首先是根据当前文档主题的多项分布抽一个主题，每个主题对应Word Vocabulary会有一个分布，按这个分布选一个单词出来填到这个slot里，记住每篇文档主题的多项分布都是不一样的，但是每个主题对应的Word Vocabulary上的分布是同一个，就是说文档到主题的分布是跟文档相关的，主题到单词的分布是全局共享的。</p>
+<p>关于LDA的开源实现推荐<a href="http://gibbslda.sourceforge.net/" target="_blank" rel="external">Gibbs LDA++</a></p>
+<h3 id="2-_函数">2. <strong>函数</strong></h3><ol>
+<li><p>Gamma Function: 阶乘的函数形式。<br>$$\Gamma(x) = \int_{0}^{+\infty}e^{-t}t^{x-1}dt (x &gt; 0) $$<br>$\Gamma(x)$ 函数的几个性质: $\Gamma(\frac{1}{2}) = \sqrt{\pi}$ ; $\Gamma(x + 1) = x\Gamma(x)$</p>
+</li>
+<li><p>Binomial Distribution: 重复N次独立的伯努利实验。<br>$$f(k; n, p) = {n \choose k} p^k(1-p)^{n-k}$$</p>
+</li>
+<li><p>Beta Distribution: 二项分布的共轭分布。<br>$$Beta(\alpha, \beta) = \frac{1}{B(\alpha, \beta)} x^{\alpha - 1} (1-x)^{\beta - 1}$$<br>Beta分布定义域为(0, 1)，其中 $\alpha$ , $\beta$ &gt; 0, $B(\alpha, \beta) = \int_0^1\mu^{\alpha-1}(1 - \mu)^{\beta - 1}d\mu = \frac{\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha + \beta)}$<br>如果 $x \thicksim Beta(\alpha, \beta)$; $E(x) = \frac{\alpha}{\alpha + \beta}$</p>
+</li>
+<li><p>Multinomial Distribution: 二项分布的推广，将每次独立实验的输出结果从2种扩展到k种。<br>$$f(x_1, …, x_k; n, p_1, …, p_k) = \begin{cases}<br>\frac{n!}{x_1!…x_k!} p_1^{x_1}…p_k^{x_k} &amp; \text{when $\sum_{i=1}^{k} x_i = n$} \\<br>0 &amp; \text{otherwise} \\<br>\end{cases} $$<br>使用Gamma函数来表示的话是这样的：<br>$$f(x_1, …, x_k; n, p_1, …, p_k) = \frac{\Gamma(\sum_i^k x_i + 1)}{\Pi_i \Gamma(x_i + 1)} \Pi_{i=1}^{k} p_{i}^{x_i}$$</p>
+</li>
+<li>Dirichlet Dirstribution: Beta分布在多项情况下的推广，与多项分布共轭。<br>$$f(p_1, …, p_k; \alpha_1, …, \alpha_k) = \frac{\Gamma(\sum_i^k \alpha_i)}{\Pi_i^k \Gamma(\alpha_i)} \Pi_{i=1}^{k} p_{i}^{\alpha_i - 1}$$<br>与Beta分布类似，其期望 $\vec{p} \thicksim Dir(\vec{\alpha})$; $E(\vec{p}) = (\frac{\alpha_1}{\sum_{i = 1}^{k}\alpha_i}, …, \frac{\alpha_k}{\sum_{i = 1}^{k}\alpha_i})$</li>
+</ol>
+<h3 id="3-_LDA_推导">3. <strong>LDA 推导</strong></h3><p>依据LDA产生一篇文档m的思路：首先从Dirichlet分布中抽取一个主题分布  $\vec{\theta_m} \thicksim Dir(\vec{\alpha})$，然后按照这个分布重复执行以下过程：</p>
+<ol>
+<li>从该主题分布 $\vec{\theta_m}$ 中抽取一个主题z，这个主题z就是全局K个主题中的一个；</li>
+<li>从主题z所对应Word Vocabulary的多项分布中抽取一个单词，作为当前slot的单词；</li>
+</ol>
+<p>这里面藏着两个Dirichlet分布，两个多项分布。一个是每篇文档都有一个自己的主体分布，就是全局的K个主题在我这篇文档中究竟是如何分布的，这个分布是一个多项分布；而所有的这些文档所对应的主体分布又做成了一个Dirichlet分布，就是在整个文档集中，一个个的主题分布符合Dirichlet分布，这是一个两层的模型；第二个多项分布也是全局上的，就是K个主题中任何一个主题，在Word Vocabulary上都是一个多项分布，就是每个单词在任何一个主题下都是按照多项分布出现的；而K个多项分布又组成了一个Dirichlet分布，这也是一个两层的模型；这里别弄混了，组成前面那个Dirichlet分布的主题分布 $\vec{\theta_m}$ 是绑定在文档上的，它是一个K维的向量，对应的Dirichlet分布也是一个K维的向量；而组成第二个Dirichlet分布的K个二项分布 $\vec{\varphi_k}$ 是一个V维的向量，是绑定在Word Vocabulary上的，对应的Dirichlet分布也是一个V维的向量；</p>
+<p>这里我省略了LDA中关于Gibbs Sampling的推导知识，是一个Markov Chain —&gt; Metropolis Hasting —&gt; Gibbs Sampling的过程，回到LDA的推导，其实准确的说是Collapsed Gibbs Sampling采样公式的推导，整个推导从整个文档集产生的联合概率开始：<br>\begin{align}<br>\mathcal{P}(\vec{W}, \vec{Z} | \vec{\alpha}, \vec{\beta}) &amp; = \mathcal{P}(\vec{W} | \vec{Z}, \vec{\beta}) \ast \mathcal{P}(\vec{Z} | \vec{\alpha}) \\<br>&amp; = \int p(\vec{W} | \vec{Z}, \Phi) p(\Phi | \vec{\beta}) d\Phi \ast \int p(\vec{Z} | \Theta) p(\Theta | \vec{\alpha}) d\Theta<br>\end{align}</p>
+<p>这里第一行左边是文档集生成的联合概率， $\vec{W}$ 和 $\vec{Z}$ 可以看做是将文档集中所有的文档拼接成的一个很长的向量以及对应的主题向量，右边第一项不包含 $\vec{\alpha}$，第二项不包含 $\vec{\beta}$，这里面有一些条件独立依据在里面，如果了解图模型的话，从LDA的图表示上面很容易理解，一篇文档中每个slot对应的主题z只和当前文档的主题分布也就是 $\vec{\alpha_m}$有关，和 $\vec{\beta}$没有关系，同样主题z到Word Vocabulary的分布也和某一篇文档的主题分布 $\vec{\alpha_m}$没有关系，它只和$\vec{\beta}$有关，所以在给定当前主题z和 $\vec{\beta}$的情况下，当前slot需要填写哪个单词和 $\vec{\alpha_m}$没有关系。所以第一行右边才可以如此分解，第二行右边则是引入了对因变量的积分，这样就可以将超参数 $\vec{\alpha}, \vec{\beta}$ 和当前的主题变量z分开，因为这些超参数并不是直接作用在主体变量上的，而是作用在主题分布上的，这些主题变量是从超参数决定的这个分布中抽取出来的。</p>
+<p>接下来我们一项项的看：<br>$$p(\vec{W} | \vec{Z}, \Phi) = \Pi_{k=1}^{K} \Pi_{t=1}^{V} \varphi_{k, t}^{n_{k}^{(t)}}$$<br>这项的含义就是把整个文档集按照每个主题下各个单词出现的次数给乘起来，其中 $n_{k}^{(t)}$ 是Word Vocabulary中第t个单词在主题k下出现的次数。</p>
+<p>$$p(\Phi | \vec{\beta}) = \Pi_{k=1}^{K} \frac{1}{\Delta(\vec{\beta})} \Pi_{t=1}^{V} \varphi_{k, t}^{\beta_t - 1}$$<br>这项的含义是从一个由 $\vec{\beta}$决定的Dirichlet分布中抽取一个 $\Phi$ 矩阵的概率，这个 $\Phi$矩阵是个K行V列的矩阵，其中 $\Delta(\vec{\beta}) = \frac{\Pi_{t=1}^{V} \Gamma(\beta_t)}{\Gamma(\sum_{t=1}^{V}\beta_t)}$。</p>
+<p>$$p(\vec{Z} | \Theta) = \Pi_{m=1}^{M} \Pi_{k=1}^{K} \theta_{m, k}^{n_{m}^{(k)}}$$<br>其中 $n_m^{(k)}$指的是在第m篇文档中，主题k出现的次数，显然这项就是把整个文档集的主题向量按照每篇文档下各个主题出现的次数给乘起来的。</p>
+<p>$$p(\Theta | \vec{\alpha}) = \Pi_{m=1}^{M} \frac{1}{\Delta(\vec{\alpha})} \Pi_{k=1}^{K} \theta_{m, k}^{\alpha_k - 1}$$</p>
+<p>这一项是从一个由 $\vec{\alpha}$ 决定的Dirichlet分布中抽取M次 $\Theta$ 的概率，这里我说的概率都是从离散事件的观点说的，其实应该是概率密度函数，这里的 $\Delta(\vec{\alpha}) = \frac{\Pi_{k=1}^{K} \Gamma(\alpha_k)}{\Gamma(\sum_{k=1}^{K}\alpha_k)}$。</p>
+<p>好，有了各个分项，我们带入就可以得到：<br>\begin{align}<br>\mathcal{P}(\vec{W} | \vec{Z}, \vec{\beta}) &amp; = \int p(\vec{W} | \vec{Z}, \Phi) p(\Phi | \vec{\beta}) d\Phi \\<br>&amp; = \int \Pi_{k=1}^{K} \Pi_{t=1}^{V} \varphi_{k, t}^{n_{k}^{(t)}} \ast \Pi_{k=1}^{K} \frac{1}{\Delta(\vec{\beta})} \Pi_{t=1}^{V} \varphi_{k, t}^{\beta_t - 1} \\<br>&amp; = \int \Pi_{k=1}^{K} \frac{1}{\Delta(\vec{\beta})} \Pi_{t=1}^{V} \varphi_{k, t}^{n_{k}^{(t)} + \beta_t - 1} \\<br>&amp; = \Pi_{k=1}^{K} \frac{\Delta(\vec{n_k} + \vec{\beta})}{\Delta(\vec{\beta})} ; \vec{n_k} = {n_{k}^{(t)}}_{t=1}^{V}<br>\end{align}</p>
+<p>这里的 $\vec{n_k}$ 代表了整个文档集中V个关键字依次在主题k中出现的次数。</p>
+<p>\begin{align}<br>\mathcal{P}(\vec{Z} | \vec{\alpha}) &amp; = \int p(\vec{Z} | \Theta) p(\Theta | \vec{\alpha}) d\Theta \\<br>&amp; = \int \Pi_{m=1}^{M} \Pi_{k=1}^{K} \theta_{m, k}^{n_{m}^{(k)}} \ast \Pi_{m=1}^{M} \frac{1}{\Delta(\vec{\alpha})} \Pi_{k=1}^{K} \theta_{m, k}^{\alpha_k - 1} \\<br>&amp; = \int \Pi_{m=1}^{M} \frac{1}{\Delta(\vec{\alpha})} \Pi_{k=1}^{K} \theta_{m, k}^{n_{m}^{(k)} + \alpha_k - 1} \\<br>&amp; = \Pi_{m=1}^{M} \frac{\Delta(\vec{n_m} + \vec{\alpha})}{\Delta(\vec{\alpha})} ; \vec{n_m} = {n_{m}^{(k)}}_{k=1}^{K}<br>\end{align}</p>
+<p>这里的 $\vec{n_m}$ 代表了第m篇文档中K个主题依次出现的次数。</p>
+<p>所以最终我们就能够得到：<br>$$\mathcal{P}(\vec{W}, \vec{Z} | \vec{\alpha}, \vec{\beta}) = \Pi_{k=1}^{K} \frac{\Delta(\vec{n_k} + \vec{\beta})}{\Delta(\vec{\beta})} \ast \Pi_{m=1}^{M} \frac{\Delta(\vec{n_m} + \vec{\alpha})}{\Delta(\vec{\alpha})}$$</p>
+<h3 id="4-_Gibbs_Sampling">4. <strong>Gibbs Sampling</strong></h3><p>本来不想讲Gibbs采样的，因为担心自己讲不清楚，但写完第三节发现不讲Gibbs采样公式推不下去了。我们先看第三节最后一个公式，也就是文档集的生成概率公式，其中我们知道什么: K, M, $\vec{\alpha}$, $\vec{\beta}$, 我们不知道什么: $\vec{n_k}$, $\vec{n_m}$, 其实就是跟主题信息相关的那个 $\Phi$ 矩阵和每篇文档的主题分布向量 $\Theta$, 好了，那我们怎么求，或者说怎么估计这些主题相关的未知变量呢？两种方法，一种是EM算法，根据我们已知的超参数和文档集，利用最大似然来估计这些主题变量，关于EM可以参考<a href="/2015/08/23/A-Note-on-the-EM/">A-Note-on-the-EM</a>；另一种就是直接从这个未知的概率分布中采样，根据采得的样本来估计这个概率分布的参数。但是既然这个概率分布未知，我们怎么才能得到它的样本呢？这就是下面要说的Gibbs采样干的事情。</p>
+<p>我们先从马尔科夫链说起，Markov Chain就是一个事件根据一个转移矩阵去转移的随机过程，但是其中有一种情况就是一个事件按照转移矩阵经过若干次转移之后，这个事件所处的状态的分布稳定了，所谓稳定是说这个事件在各个状态上的概率不再变化了。具体来讲，假设一个事件具有n个状态，初始时它在各个状态上的概率为单位向量 $\vec{X} = (x_1, x_2, …, x_n)$, 每一状态上的值代表了其处在该状态上的概率，然后我们按照某个固定的n * n的矩阵进行一次转移得到新的向量 $\vec{X^{\prime}}$，刚开始 $\vec{X}  !=  \vec{X^{\prime}}$, 但经过若干次转移后，就可以得到 $\vec{X} == \vec{X^{\prime}}$，对应到文档集的生成概率上来，我们不是想求这个概率分布么？我们先从一个已知的状态开始，通过某一个转移矩阵进行转移，等收敛后，我们就得到了各个状态上的概率，也就得到了要求的这个分布。但转移能够收敛到唯一分布这种情况是有条件的，它要求最终收敛到的这个分布 $\vec{X}$ 和你的转移矩阵 $\mathcal{P}$ 之间要满足一个细稳分布(Detailed Balance)的约束，就是 $x_{i} p_{ij} = x_{j} p_{ji}$.其实对唯一性的约束是另一个条件，这里不细讲了。</p>
+<p>这里有一个问题，就是对于我们要求的文档集生产概率而言，我们怎么得到一个满足细稳分布的一个转移矩阵？这就是Gibbs Sampling干的事情，Gibbs采样正是给出了一个满足这种要求的转移矩阵，在讲Gibbs之前我们需要先搞明白状态数和空间维数的关系，因为这里Gibbs采样要运用到高纬空间中。首先我们上面讲马尔科夫链时举得那个具有n个状态的向量 $\vec{X}$它是在一维空间里的，也就是说它是一条轴线上的n个点；那么如果在2维空间中有： ${(x, y) | x \in (1, 2, 3); y \in (2, 3)}$ , 那么一共有多少个状态？6个！那回头看我们的文档集生成概率分布是多少维的？我们假设每篇文档的长度为 d，那么它有 2 <em> M </em> d维，其中M <em> d维是用来填Word的，另外M </em> d维是用来填主题的；前M <em> d维对我们来说是可见的，当有了一个文档集之后就固定了；后M </em> d维是不可见的，未知的。那共有多少个状态呢？共有 $|V|^{M<em>d} </em> K^{M<em>d}$个状态，当有了一个文档集后， $|V|^{M</em>d}$那部分就固定了，只剩下 $K^{M<em>d}$个状态可以互相转移，我们要做的就是把这 $K^{M</em>d}$ 个状态的分布给找出来，然后从中取一个概率最大的状态作为生产当前文档集的状态。好了，说回概率转移矩阵，还以上面的2维空间为例，假如只考虑A = (x=1, y=2)和B = (x=1, y=3)这两个状态之间的转移问题的话，什么样的P(A-&gt;B)和P(B-&gt;A)要满足细稳分布的约束呢？我们看下面的等式：</p>
+<p>$$P(x=1, y=2) <em> P(y=3|x=1) = P(x=1, y=3) </em> P(y=2|x=1)$$</p>
+<p>就是说，如果保持其他维度不变，只在一个维度上，按照这一维度上的条件概率进行转移是可以满足细稳分布的，这就是Gibbs采样给出的转移矩阵。对应到我们的文档集，其中隐藏的主题部分是M <em> d维，我们只要保证其中M </em> d - 1维不变，在剩下那一维上按照条件概率进行转移，就可以得到一个满足细稳约束的转移矩阵。由于主题在每一维上可以有K个值选择，我们需要计算K个条件概率：</p>
+<p>$$\mathcal{P}(z_{i} = k | \vec{W}, \vec{Z_{\neg i}}) = \frac{\mathcal{P}(\vec{W}, \vec{Z})}{\mathcal{P}(\vec{W}, \vec{Z_{\neg i}})}$$</p>
+<p>其中 $i \in (1, 2, …, M * d), k \in (1, 2, …, K)$, 然后选概率最大的一个主题k作为新的状态，经过若干次转移后，就可以得到各个状态上的概率，从而选出概率最大的作为文档集的主题分布。下面看一下具体的采样公式：<br>\begin{align}<br>\mathcal{P}(z_{i} = k | \vec{W}, \vec{Z_{\neg i}}) &amp; = \frac{\mathcal{P}(\vec{W}, \vec{Z})}{\mathcal{P}(\vec{W}, \vec{Z_{\neg i}})} \\<br>&amp; \propto \frac{\Delta(\vec{n_k} + \vec{\beta})}{\Delta(\vec{n_{k, \neg i}} + \vec{\beta})} \ast \frac{\Delta(\vec{n_m} + \vec{\alpha})}{\Delta(\vec{n_{m, \neg i}} + \vec{\alpha})} \\<br>&amp; \propto \frac{\Gamma(n_i + \beta_i)}{\Gamma(n_i - 1 + \beta_i)} \frac{\Gamma(\sum_{t=1}^{V}(n_{t, \neg i} + \beta_t))}{\Gamma(\sum_{t=1}^{V}(n_t + \beta_t))} \ast \frac{\Gamma(n_k + \alpha_k)}{\Gamma(n_k - 1 + \alpha_k)} \frac{\Gamma(\sum_{t=1}^{K}(n_{t, \neg i} + \alpha_t))}{\Gamma(\sum_{t=1}^{K}(n_t + \alpha_t))} \\<br>&amp; = \frac{n_{k, w_i}^{\neg i} + \beta}{\sum_{i=1}^{V} n_{k, i}^{\neg i} + V\beta} \ast \frac{n_{m, k}^{\neg i} + \alpha}{\sum_{i=1}^{K} n_{m, i}^{\neg i} + K\alpha}<br>\end{align}<br>最后这个等式的第一项代表的是 $w_i$这个词在主题k下的概率；第二项代表的是主题k在文档m中出现的概率。<br>从当前的主题状态触发，按照这个采样公式，我们可以得到下一个主题状态，然后根据新的主题状态我们可以得到概率最大的 $\mathcal{P}(\vec{W}, \vec{Z})$，再进一步得到新的采样概率，然后就这样一直迭代下去，最后稳定之后，我们可以得到每篇文档的主题分布和整个文档集上的矩阵 $\Phi$。</p>
+<h3 id="5-_Gibbs_LDA++_Code">5. <strong>Gibbs LDA++ Code</strong></h3>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ml/">ml</a><a href="/tags/note/">note</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://muye5.github.io/2015/09/06/A-Note-on-the-LDA/" data-title="A Note on the LDA | Muye Note" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/08/23/A-Note-on-the-EM/"  title="A Note on the EM">
+ <strong>下一篇：</strong><br/> 
+ <span>A Note on the EM
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_前言"><span class="toc-number">1.</span> <span class="toc-text">1. 前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_函数"><span class="toc-number">2.</span> <span class="toc-text">2. 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_LDA_推导"><span class="toc-number">3.</span> <span class="toc-text">3. LDA 推导</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_Gibbs_Sampling"><span class="toc-number">4.</span> <span class="toc-text">4. Gibbs Sampling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_Gibbs_LDA++_Code"><span class="toc-number">5.</span> <span class="toc-text">5. Gibbs LDA++ Code</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/ml/" title="ml">ml<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/scikit-learn/" title="scikit-learn">scikit-learn<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/kaggle/" title="kaggle">kaggle<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/note/" title="note">note<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情鏈接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="muyepiaozhou">muyepiaozhou</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
