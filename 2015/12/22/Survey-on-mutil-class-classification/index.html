@@ -1,0 +1,577 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Survey on mutil-class classification | Muye Note</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="muyepiaozhou">
+    
+
+    
+    <meta name="description" content="1. Multiclass Classification Methods">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Survey on mutil-class classification">
+<meta property="og:url" content="http://muye5.github.io/2015/12/22/Survey-on-mutil-class-classification/index.html">
+<meta property="og:site_name" content="Muye Note">
+<meta property="og:description" content="1. Multiclass Classification Methods">
+<meta property="og:image" content="/img/multiclass/pic_1.png">
+<meta property="og:image" content="/img/multiclass/pic_2.png">
+<meta property="og:image" content="/img/multiclass/pic_3.png">
+<meta property="og:image" content="/img/multiclass/pic_4.png">
+<meta property="og:image" content="/img/multiclass/pic_5.png">
+<meta property="og:image" content="/img/multiclass/pic_6.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Survey on mutil-class classification">
+<meta name="twitter:description" content="1. Multiclass Classification Methods">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Muye Note" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Muye Note" title="Muye Note"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Muye Note">Muye Note</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜單">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:muye5.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/12/22/Survey-on-mutil-class-classification/" title="Survey on mutil-class classification" itemprop="url">Survey on mutil-class classification</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="muyepiaozhou" target="_blank" itemprop="author">muyepiaozhou</a>
+		
+  <p class="article-time">
+    <time datetime="2015-12-22T12:41:55.000Z" itemprop="datePublished"> 發表於 2015-12-22</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目錄</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Multiclass_Classification_Methods"><span class="toc-number">1.</span> <span class="toc-text">1. Multiclass Classification Methods</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Extensible_Algorithms"><span class="toc-number">2.</span> <span class="toc-text">2. Extensible Algorithms</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Decomposing_Into_Binary_Classification"><span class="toc-number">3.</span> <span class="toc-text">3. Decomposing Into Binary Classification</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="1-_Multiclass_Classification_Methods">1. <strong>Multiclass Classification Methods</strong></h3><a id="more"></a>
+<ul>
+<li><strong>Dataset:</strong> $$\lbrace (x_i, y_i) | x_i \in R^n, y_i \in \lbrace 1,…,K \rbrace \rbrace$$</li>
+<li><p><strong>Algorithms:</strong></p>
+<ul>
+<li><p>Some can be naturally extended from binary to multiclass classification</p>
+<ol>
+<li>Neural Networks</li>
+<li>Decision Trees</li>
+<li>KNN</li>
+<li>Naive Bayes</li>
+<li>Softmax</li>
+<li>SVM</li>
+</ol>
+</li>
+<li><p>Some need special formulations</p>
+<ol>
+<li>convert multiclass problem into a set of binary classification</li>
+<li>try to pose a hierarchy on the output space</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-_Extensible_Algorithms">2. <strong>Extensible Algorithms</strong></h3><ul>
+<li><p><strong>Neural Networks</strong><br><img src="/img/multiclass/pic_1.png" ,="" class="img-center"></p>
+<ul>
+<li>Having N binary neurons in output layer</li>
+<li>One-Per-Class Coding</li>
+<li>Distributed Output Coding<ol>
+<li>Each class is assigned a unique binary codeword from 0 to $2^N - 1$<br><img src="/img/multiclass/pic_2.png" ,="" class="img-center"></li>
+<li>For testing, nearest codeword is considered the winning class according to some distance measure. e.g. hamming distance<br><img src="/img/multiclass/pic_3.png" ,="" class="img-center"></li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p><strong>Decision Trees</strong><br>splitting based on some measures<br>each leaf node corresponds to a class label</p>
+</li>
+<li><p><strong>KNN</strong><br>distance measure</p>
+</li>
+<li><p><strong>Naive Bayes</strong><br>maximun a posterior (map)<br>$C = argmax_{c} P(C=c | x_1, …, x_d)$</p>
+</li>
+<li><p><strong>Softmax</strong><br>e.g. me, crf<br>$P(y=k|x) = \frac {e^{w_{k}^{T} \cdot x}} {\sum_{j} e^{w_{j}^{T} \cdot x}}$</p>
+</li>
+<li><p><strong>SVM</strong><br>Binary: maximizing the minimum distance from the separating hyperplane to the nearest example<br>Multiclass:<br>$$min_{w_1,…,w_K} \frac{1}{2}||(w_1,…,w_K)||^2 + C\sum_{ik}\epsilon_{ik}$$<br>$$s.t. \forall (i, k), w_{y^i}^{T}x^{i} - w_{k}^{T}x^{i} \ge 1\lbrace y^{i} \neq k\rbrace - \epsilon_{ik}$$<br>Conclusion: none of these approaches were superior to using a set of binary SVMs in an ‘All Pairs’ framework</p>
+</li>
+</ul>
+<h3 id="3-_Decomposing_Into_Binary_Classification">3. <strong>Decomposing Into Binary Classification</strong></h3><ul>
+<li><p><strong>One-vs-All (OVA)</strong><br>reduce classifying among K classes into K binary problem<br>positive: given class<br>negative: other K - 1 classes<br>output: maximum output is considered the winner<br>constrain: binary classifier should be tuned well</p>
+</li>
+<li><p><strong>All-vs-All (AVA)</strong><br>reduce classifying among K classes into K(K-1)/2 binary problem<br>positive/negative: pairwise<br>output: class with maximum number of votes wins<br>advantage: better than one-vs-all in general</p>
+</li>
+<li><p><strong>Error-Correcting Output-Coding (ECOC)</strong></p>
+<ul>
+<li>training N binary classifier to distinguish between K classes</li>
+<li>each row of M corresponds to a certain class</li>
+<li>comparing between output and the given K codeword, which with the minimum (hamming distance) wins</li>
+<li>$d(M(k), f(x)) = \sum_{i=1}^{N} L(M(k, i), f_i (x))$<br><img src="/img/multiclass/pic_4.png" ,="" class="img-center"></li>
+</ul>
+<ol>
+<li>Generalized Coding<br>from {0, 1} to {-1, 0, +1}<br>special-case: OVA and AVA</li>
+<li>What is a good matrix M<br>codewords are well-separated in hamming distance<br>a large hamming distance between pairs of columns and also between each column and the complements of the rest</li>
+<li>How to generate the matrix M<br>randomly generating 10000 matrices and choosing the one with the highest minimum hamming distance among its rows.<br>best coding strategy is problem dependent</li>
+<li>Conclusion<br>OVA is generally inferior to the other approaches, while no one approach generally outperforms the others</li>
+</ol>
+</li>
+<li><p><strong>Binary Hierarchical Classification (BHC)</strong> </p>
+<ul>
+<li>BHC decomposes a K class problem into K-1 binary meta-class problems</li>
+<li>The grouping of the individual classes into meta-classes is determined by the class distributions</li>
+<li><p>Classes that are similar to each other in the input feature space are lumped into the same meta-class higher up in the tree<br><img src="/img/multiclass/pic_5.png" ,="" class="img-center"></p>
+</li>
+<li><p>Fisher’s Discriminant (FD / LDA)</p>
+</li>
+</ul>
+<ol>
+<li>FD is closely related to PCA in that they both look for linear combinations of variables which best explain the data.</li>
+<li>FD explicitly attempts to model the difference between the classes of data. </li>
+<li>PCA on the other hand does not take into account any difference in classes.</li>
+<li>Maximum of FD<br>\begin{align}<br>W &amp; = P(\omega_{\alpha}) \Sigma_{\alpha} + P(\omega_{\beta}) \Sigma_{\beta} \\<br>B &amp; = (\mu_\alpha - \mu_\beta)(\mu_\alpha - \mu_\beta)^T \\<br>\hat w &amp; = argmax_w \frac {w^TBw}{w^TWw} \\<br>&amp; = W^{-1} (\mu_\alpha - \mu_\beta) \qquad (4)<br>\end{align}</li>
+</ol>
+<ul>
+<li>Split K classes into 2 parts by FD through Annealing</li>
+</ul>
+<ol>
+<li>Initialise $P(\Omega_\alpha | \omega_1) = 1$ for some $\omega_1 \in \Omega$ and $P(\Omega_\alpha | \omega) = 0.5, \forall \omega \in \Omega - \omega_1$. Temperature $T = T_0$ (user defined parameter).</li>
+<li>Compute the means and covariances of the meta-classes:<br>$$\mu_\gamma = \sum_{\omega \in \Omega} P(\omega | \Omega_{\gamma}) \mu_{\omega}, \gamma \in \lbrace \alpha, \beta \rbrace \qquad (6)$$<br>$$\Sigma_\gamma = \sum_{\omega \in \Omega} \frac{P(\omega | \Omega_\gamma)}{N_\omega} [\sum_{x \in \chi_\omega} (x - \mu_\gamma)(x - \mu_\gamma)^T], \gamma \in \lbrace \alpha, \beta \rbrace \qquad (7)$$<br>$$P(\omega | \Omega_\gamma) = \frac {P(\omega)P(\Omega_\gamma|\omega)}{P(\Omega_\gamma)}, \gamma \in \lbrace \alpha, \beta \rbrace$$<br>$$P(\Omega_\gamma) = \sum_{\omega \in \Omega} P(\Omega_\gamma | \omega)P(\omega | \Omega)$$<br>$$P(\omega|\Omega) = \frac {P(\omega)}{P(\Omega)} = \frac{P(\omega)}{\sum_{\rho \in \Omega}P(\rho)}$$<br>$$P(\omega) = \frac {N_\omega}{\sum_{\omega \in \Omega}N_\omega}$$</li>
+<li>Compute the Fisher projection vector w using Eq.(4) with the sample mean and covariance of the meta-class for the parameters in Eqs (6) and (7)</li>
+<li>Compute the mean log-likelihood of meta-classes $\Omega_\gamma (\gamma \in \lbrace \alpha, \beta \rbrace)$:<br>$$L(\Omega_\gamma | \omega) = \frac {1}{N_\omega} \sum_{x \in \chi_\omega} log p(w^Tx|\Omega_\gamma) \qquad (8)$$<br>where the pdf of each $\Omega_{\gamma}$ in the one dimensional projected space is modelled as Gaussian:<br>$$p(w^Tx|\Omega_\gamma) = N(w^Tx; w^T\mu_\gamma, w^T\Sigma_{\gamma}w)$$</li>
+<li>Update the meta-class posteriors:<br>$$P(\omega_\alpha|\omega) = \frac {exp(L(\Omega_\alpha|\omega)/T)}{exp(L(\Omega_\alpha|\omega)/T) + exp(L(\Omega_\beta|\omega)/T)}$$</li>
+<li>Repeat Steps 2 through 4 until the incremental increase in Fisher Discriminant is insignificant(e.g. less than 5%)</li>
+<li>Compute the entropy of meta-class posterior:<br>$$H = -\frac {1}{|\Omega|} \sum_{\omega \in \Omega} [P(\Omega_\alpha|\omega)log_{2}P(\Omega_{\alpha}\omega) + P(\Omega_\beta|\omega)log_{2}P(\Omega_{\beta}\omega)]$$</li>
+<li>if $H \lt \Theta_H$ (user defined threshold) stop, otherwise:<br>cool temperature: $T = T\Theta_T$, ($\Theta_T \lt 1$ is a user defined cooling parameter)<br>go to step 2</li>
+</ol>
+</li>
+<li><p><strong>ECOC vs BHC</strong></p>
+<ol>
+<li>ECOC is an ensemble solution</li>
+<li>ECOC partitions the input space</li>
+<li>ECOC does not take into consideration the affinities among the individual classes. Some of the groupings might result in complex decision boundaries</li>
+<li><p>Though multiple solutions have been proposed, none of them are guaranteed to produce the optimal matrix for a problem at hand</p>
+</li>
+<li><p>BHC partitions the output space</p>
+</li>
+<li>BHC uses far lesser number of classifiers in most cases</li>
+<li>The binary trees produced by the BHC are consistent with those a human expert might have  constructed when given just the class label</li>
+<li>BHC often provides a valuable tool for extracting domain knowledge and achieve better results when coarser granularity of the output space is acceptable<br><img src="/img/multiclass/pic_6.png" ,="" class="img-center"></li>
+</ol>
+</li>
+<li><p><strong>Reference</strong></p>
+<ol>
+<li>A Comparison of Methods for Multiclass Support Vector Machines</li>
+<li>Survey on Multiclass Classification Methods</li>
+<li>An Empirical Comparison of Hierarchical vs. Twolevel Approaches to Multiclass Problems</li>
+<li>Binary Hierarchical Classifier for Hyperspectral Data Analysis</li>
+<li>Hierarchical Fusion of Multiple Classifiers for Hyperspectral Data Analysis</li>
+<li>Fisher Linear Discriminant Analysis</li>
+</ol>
+</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ml/">ml</a><a href="/tags/note/">note</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://muye5.github.io/2015/12/22/Survey-on-mutil-class-classification/" data-title="Survey on mutil-class classification | Muye Note" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/09/06/A-Note-on-the-LDA/"  title="A Note on the LDA">
+ <strong>下一篇：</strong><br/> 
+ <span>A Note on the LDA
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="顯示側邊欄"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目錄</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Multiclass_Classification_Methods"><span class="toc-number">1.</span> <span class="toc-text">1. Multiclass Classification Methods</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Extensible_Algorithms"><span class="toc-number">2.</span> <span class="toc-text">2. Extensible Algorithms</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Decomposing_Into_Binary_Classification"><span class="toc-number">3.</span> <span class="toc-text">3. Decomposing Into Binary Classification</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隱藏側邊欄"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">標簽</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/ml/" title="ml">ml<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/scikit-learn/" title="scikit-learn">scikit-learn<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/kaggle/" title="kaggle">kaggle<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/note/" title="note">note<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情鏈接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 訂閱</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="/about" target="_blank" title="muyepiaozhou">muyepiaozhou</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回頂部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
