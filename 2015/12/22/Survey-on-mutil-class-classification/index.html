@@ -17,12 +17,12 @@
 <meta property="og:url" content="http://muye5.github.io/2015/12/22/Survey-on-mutil-class-classification/index.html">
 <meta property="og:site_name" content="Muye Note">
 <meta property="og:description" content="1. Multiclass Classification Methods">
-<meta property="og:image" content="/img/multiclass/pic_1.png">
-<meta property="og:image" content="/img/multiclass/pic_2.png">
-<meta property="og:image" content="/img/multiclass/pic_3.png">
-<meta property="og:image" content="/img/multiclass/pic_4.png">
-<meta property="og:image" content="/img/multiclass/pic_5.png">
-<meta property="og:image" content="/img/multiclass/pic_6.png">
+<meta property="og:image" content="/img/multiclass/pic1.png">
+<meta property="og:image" content="/img/multiclass/pic2.png">
+<meta property="og:image" content="/img/multiclass/pic3.png">
+<meta property="og:image" content="/img/multiclass/pic4.png">
+<meta property="og:image" content="/img/multiclass/pic5.png">
+<meta property="og:image" content="/img/multiclass/pic6.png">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Survey on mutil-class classification">
 <meta name="twitter:description" content="1. Multiclass Classification Methods">
@@ -130,13 +130,13 @@
 </li>
 </ul>
 <h3 id="2-_Extensible_Algorithms">2. <strong>Extensible Algorithms</strong></h3><ul>
-<li><p><strong>Neural Networks</strong><br><img src="/img/multiclass/pic_1.png" ,="" class="img-center"></p>
+<li><p><strong>Neural Networks</strong><br><img src="/img/multiclass/pic1.png" ,="" class="img-center"></p>
 <ul>
 <li>Having N binary neurons in output layer</li>
 <li>One-Per-Class Coding</li>
 <li>Distributed Output Coding<ol>
-<li>Each class is assigned a unique binary codeword from 0 to $2^N - 1$<br><img src="/img/multiclass/pic_2.png" ,="" class="img-center"></li>
-<li>For testing, nearest codeword is considered the winning class according to some distance measure. e.g. hamming distance<br><img src="/img/multiclass/pic_3.png" ,="" class="img-center"></li>
+<li>Each class is assigned a unique binary codeword from 0 to $2^N - 1$<br><img src="/img/multiclass/pic2.png" ,="" class="img-center"></li>
+<li>For testing, nearest codeword is considered the winning class according to some distance measure. e.g. hamming distance<br><img src="/img/multiclass/pic3.png" ,="" class="img-center"></li>
 </ol>
 </li>
 </ul>
@@ -162,7 +162,7 @@
 <li>training N binary classifier to distinguish between K classes</li>
 <li>each row of M corresponds to a certain class</li>
 <li>comparing between output and the given K codeword, which with the minimum (hamming distance) wins</li>
-<li>$d(M(k), f(x)) = \sum_{i=1}^{N} L(M(k, i), f_i (x))$<br><img src="/img/multiclass/pic_4.png" ,="" class="img-center"></li>
+<li>$d(M(k), f(x)) = \sum_{i=1}^{N} L(M(k, i), f_i (x))$<br><img src="/img/multiclass/pic4.png" ,="" class="img-center"></li>
 </ul>
 <ol>
 <li>Generalized Coding<br>from {0, 1} to {-1, 0, +1}<br>special-case: OVA and AVA</li>
@@ -175,7 +175,7 @@
 <ul>
 <li>BHC decomposes a K class problem into K-1 binary meta-class problems</li>
 <li>The grouping of the individual classes into meta-classes is determined by the class distributions</li>
-<li><p>Classes that are similar to each other in the input feature space are lumped into the same meta-class higher up in the tree<br><img src="/img/multiclass/pic_5.png" ,="" class="img-center"></p>
+<li><p>Classes that are similar to each other in the input feature space are lumped into the same meta-class higher up in the tree<br><img src="/img/multiclass/pic5.png" ,="" class="img-center"></p>
 </li>
 <li><p>Fisher’s Discriminant (FD / LDA)</p>
 </li>
@@ -211,7 +211,7 @@
 </li>
 <li>BHC uses far lesser number of classifiers in most cases</li>
 <li>The binary trees produced by the BHC are consistent with those a human expert might have  constructed when given just the class label</li>
-<li>BHC often provides a valuable tool for extracting domain knowledge and achieve better results when coarser granularity of the output space is acceptable<br><img src="/img/multiclass/pic_6.png" ,="" class="img-center"></li>
+<li>BHC often provides a valuable tool for extracting domain knowledge and achieve better results when coarser granularity of the output space is acceptable<br><img src="/img/multiclass/pic6.png" ,="" class="img-center"></li>
 </ol>
 </li>
 <li><p><strong>Reference</strong></p>
