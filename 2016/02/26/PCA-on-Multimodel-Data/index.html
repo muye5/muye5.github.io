@@ -4,22 +4,25 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Hello World | Muye Note</title>
+    <title>PCA on Multimodel Data | Muye Note</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="muyepiaozhou">
     
 
     
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.">
+    <meta name="description" content="PCA(principal component analysis)可以对数据进行映射，将数据映射到方差(或者说能量)最大的一组基上，然后我们可以按照各个基对应的特征值从大到小排序，删除一些特征值很小的基，从而实现降为或者去噪的目的。但是我理解这里有一个假设就是数据是单模态的，如果是多模态情况下PCA找出的基会是什么样子呢？看下面一个例子：">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://muye5.github.io/2015/05/09/hello-world/index.html">
+<meta property="og:title" content="PCA on Multimodel Data">
+<meta property="og:url" content="http://muye5.github.io/2016/02/26/PCA-on-Multimodel-Data/index.html">
 <meta property="og:site_name" content="Muye Note">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.">
+<meta property="og:description" content="PCA(principal component analysis)可以对数据进行映射，将数据映射到方差(或者说能量)最大的一组基上，然后我们可以按照各个基对应的特征值从大到小排序，删除一些特征值很小的基，从而实现降为或者去噪的目的。但是我理解这里有一个假设就是数据是单模态的，如果是多模态情况下PCA找出的基会是什么样子呢？看下面一个例子：">
+<meta property="og:image" content="/img/mutilmodal_pca/data.png">
+<meta property="og:image" content="/img/mutilmodal_pca/pca.png">
+<meta property="og:image" content="/img/mutilmodal_pca/ica.png">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.">
+<meta name="twitter:title" content="PCA on Multimodel Data">
+<meta name="twitter:description" content="PCA(principal component analysis)可以对数据进行映射，将数据映射到方差(或者说能量)最大的一组基上，然后我们可以按照各个基对应的特征值从大到小排序，删除一些特征值很小的基，从而实现降为或者去噪的目的。但是我理解这里有一个假设就是数据是单模态的，如果是多模态情况下PCA找出的基会是什么样子呢？看下面一个例子：">
 
     
     <link rel="alternative" href="/atom.xml" title="Muye Note" type="application/atom+xml">
@@ -79,14 +82,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/05/09/hello-world/" title="Hello World" itemprop="url">Hello World</a>
+      <a href="/2016/02/26/PCA-on-Multimodel-Data/" title="PCA on Multimodel Data" itemprop="url">PCA on Multimodel Data</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="muyepiaozhou" target="_blank" itemprop="author">muyepiaozhou</a>
 		
   <p class="article-time">
-    <time datetime="2015-05-09T09:31:53.059Z" itemprop="datePublished"> 发表于 2015-05-09</time>
+    <time datetime="2016-02-26T07:49:47.000Z" itemprop="datePublished"> 发表于 2016-02-26</time>
     
   </p>
 </header>
@@ -95,24 +98,26 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quick_Start"><span class="toc-number">1.</span> <span class="toc-text">Quick Start</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Create_a_new_post"><span class="toc-number">1.1.</span> <span class="toc-text">Create a new post</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run_server"><span class="toc-number">1.2.</span> <span class="toc-text">Run server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generate_static_files"><span class="toc-number">1.3.</span> <span class="toc-text">Generate static files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy_to_remote_sites"><span class="toc-number">1.4.</span> <span class="toc-text">Deploy to remote sites</span></a></li></ol></li></ol>
+			
 		
 		</div>
 		
-		<p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.<br><a id="more"></a></p>
-<h2 id="Quick_Start">Quick Start</h2><h3 id="Create_a_new_post">Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+		<p>PCA(principal component analysis)可以对数据进行映射，将数据映射到方差(或者说能量)最大的一组基上，然后我们可以按照各个基对应的特征值从大到小排序，删除一些特征值很小的基，从而实现降为或者去噪的目的。但是我理解这里有一个假设就是数据是单模态的，如果是多模态情况下PCA找出的基会是什么样子呢？看下面一个例子：<br><a id="more"></a><br>如下生成3簇正态分布的数据，X轴上分布是一致的，通过Y轴来区分：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> scale</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">N = <span class="number">500</span></span><br><span class="line">mode = np.random.randint(<span class="number">0</span>, <span class="number">3</span>, N) * <span class="number">10</span></span><br><span class="line">x = np.random.normal(<span class="number">0</span>, <span class="number">100</span>, N)</span><br><span class="line">y = mode + np.random.normal(<span class="number">0</span>, <span class="number">1</span>, N)</span><br><span class="line"></span><br><span class="line">X = np.vstack([x, y]).T</span><br><span class="line">X = scale(X)</span><br><span class="line"></span><br><span class="line">plt.title(<span class="string">'Generated Mutilmodal Data'</span>)</span><br><span class="line">plt.scatter(X.T[<span class="number">0</span>], X.T[<span class="number">1</span>], c=<span class="string">'k'</span>, edgecolor=<span class="string">'w'</span>, s=<span class="number">50</span>)</span><br><span class="line">plt.xlabel(<span class="string">'x'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'y'</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure></p>
+<p><img src="/img/mutilmodal_pca/data.png" ,="" class="img-center"></p>
+<p>那么在这组数据上使用PCA会是什么效果呢？<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.decomposition <span class="keyword">import</span> PCA</span><br><span class="line"></span><br><span class="line">pca = PCA()</span><br><span class="line">Y = pca.fit_transform(X.copy())</span><br><span class="line"></span><br><span class="line">plt.title(<span class="string">'PCA on Mutilmodal Data'</span>)</span><br><span class="line">plt.scatter(Y.T[<span class="number">0</span>], Y.T[<span class="number">1</span>], c=<span class="string">'k'</span>, edgecolor=<span class="string">'w'</span>, s=<span class="number">50</span>)</span><br><span class="line">plt.xlabel(<span class="string">'x'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'y'</span>)</span><br><span class="line">plt.show()</span><br><span class="line">plt.close()</span><br></pre></td></tr></table></figure></p>
+<p><img src="/img/mutilmodal_pca/pca.png" ,="" class="img-center"><br>PCA找出来的这两个基其实是原来坐标轴的对角线，在这个方向上数据的方差最大，这没错，但是如果你拿变换后的数据来进行聚类或者分类的话，似乎还没有原数据好，对不对？因为原数据明显是按照Y轴可区分的，PCA找到的这两个基是相关的。<br>下面使用IPC(independent component analysis)来分解试试：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.decomposition <span class="keyword">import</span> FastICA</span><br><span class="line"></span><br><span class="line">ica = FastICA()</span><br><span class="line">Z = ica.fit_transform(Y.copy())</span><br><span class="line"></span><br><span class="line">plt.title(<span class="string">'ICA on Mutilmodal Data'</span>)</span><br><span class="line">plt.scatter(Z.T[<span class="number">0</span>], Z.T[<span class="number">1</span>], c=<span class="string">'k'</span>, edgecolor=<span class="string">'w'</span>, s=<span class="number">50</span>)</span><br><span class="line">plt.xlabel(<span class="string">'x'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'y'</span>)</span><br><span class="line">plt.show()</span><br><span class="line">plt.close()</span><br></pre></td></tr></table></figure></p>
+<p><img src="/img/mutilmodal_pca/ica.png" ,="" class="img-center"></p>
+<p>所以有时候对数据分解的时候PCA不一定好，可以试试ICA。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ml/">ml</a><a href="/tags/sklearn/">sklearn</a>
+  </div>
 
 </div>
 
@@ -120,7 +125,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://muye5.github.io/2015/05/09/hello-world/" data-title="Hello World | Muye Note" data-tsina="null" class="share clearfix">
+	  <div data-url="http://muye5.github.io/2016/02/26/PCA-on-Multimodel-Data/" data-title="PCA on Multimodel Data | Muye Note" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -133,19 +138,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/05/09/入门代码分享-LogisticRegression/" title="入门代码分享---LogisticRegression">
-  <strong>上一篇：</strong><br/>
-  <span>
-  入门代码分享---LogisticRegression</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/05/09/Forecast-Gender-Based-On-Item-Viewing-History/"  title="Forecast Gender Based On Item Viewing History">
+<a href="/2015/12/22/Survey-on-mutil-class-classification/"  title="Survey on mutil-class classification">
  <strong>下一篇：</strong><br/> 
- <span>Forecast Gender Based On Item Viewing History
+ <span>Survey on mutil-class classification
 </span>
 </a>
 </div>
@@ -160,7 +157,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quick_Start"><span class="toc-number">1.</span> <span class="toc-text">Quick Start</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Create_a_new_post"><span class="toc-number">1.1.</span> <span class="toc-text">Create a new post</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run_server"><span class="toc-number">1.2.</span> <span class="toc-text">Run server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generate_static_files"><span class="toc-number">1.3.</span> <span class="toc-text">Generate static files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy_to_remote_sites"><span class="toc-number">1.4.</span> <span class="toc-text">Deploy to remote sites</span></a></li></ol></li></ol>
+ 
  
   </div>
 
