@@ -4,22 +4,22 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Neural Network in 11 Python Code | Muye Note</title>
+    <title>Probabilistic Text Modeling with Orthogonalized Topics | Muye Note</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="muyepiaozhou">
     
 
     
-    <meta name="description" content="原文章看到这个11行搞定Neural Netwok的Python代码，禁不住转了过来，就喜欢这种短小精悍却又思路清晰的Code，直接上代码：">
+    <meta name="description" content="论文：Probabilistic Text Modeling with Orthogonalized Topics以往的主题模型都是强调文档-主题的分布，很少关心主题-词的分布，论文提出一种OTM(Orthogonalized Topic Model)模型，增加对主题-词分布的正交约束，使用EM算法来求解。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Neural Network in 11 Python Code">
-<meta property="og:url" content="http://muye5.github.io/2015/07/20/Neural-Network-in-11-Python-Code/index.html">
+<meta property="og:title" content="Probabilistic Text Modeling with Orthogonalized Topics">
+<meta property="og:url" content="http://muye5.github.io/2016/02/26/Probabilistic-Text-Modeling-with-Orthogonalized-Topics/index.html">
 <meta property="og:site_name" content="Muye Note">
-<meta property="og:description" content="原文章看到这个11行搞定Neural Netwok的Python代码，禁不住转了过来，就喜欢这种短小精悍却又思路清晰的Code，直接上代码：">
+<meta property="og:description" content="论文：Probabilistic Text Modeling with Orthogonalized Topics以往的主题模型都是强调文档-主题的分布，很少关心主题-词的分布，论文提出一种OTM(Orthogonalized Topic Model)模型，增加对主题-词分布的正交约束，使用EM算法来求解。">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Neural Network in 11 Python Code">
-<meta name="twitter:description" content="原文章看到这个11行搞定Neural Netwok的Python代码，禁不住转了过来，就喜欢这种短小精悍却又思路清晰的Code，直接上代码：">
+<meta name="twitter:title" content="Probabilistic Text Modeling with Orthogonalized Topics">
+<meta name="twitter:description" content="论文：Probabilistic Text Modeling with Orthogonalized Topics以往的主题模型都是强调文档-主题的分布，很少关心主题-词的分布，论文提出一种OTM(Orthogonalized Topic Model)模型，增加对主题-词分布的正交约束，使用EM算法来求解。">
 
     
     <link rel="alternative" href="/atom.xml" title="Muye Note" type="application/atom+xml">
@@ -79,14 +79,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/07/20/Neural-Network-in-11-Python-Code/" title="Neural Network in 11 Python Code" itemprop="url">Neural Network in 11 Python Code</a>
+      <a href="/2016/02/26/Probabilistic-Text-Modeling-with-Orthogonalized-Topics/" title="Probabilistic Text Modeling with Orthogonalized Topics" itemprop="url">Probabilistic Text Modeling with Orthogonalized Topics</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="muyepiaozhou" target="_blank" itemprop="author">muyepiaozhou</a>
 		
   <p class="article-time">
-    <time datetime="2015-07-20T12:45:42.000Z" itemprop="datePublished"> 發表於 2015-07-20</time>
+    <time datetime="2016-02-26T08:41:27.000Z" itemprop="datePublished"> 發表於 2016-02-26</time>
     
   </p>
 </header>
@@ -95,20 +95,18 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目錄</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Latent_Semantic_Analysis"><span class="toc-number">1.</span> <span class="toc-text">1. Latent Semantic Analysis</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Probabilistic_Latent_Semantic_Analysis"><span class="toc-number">2.</span> <span class="toc-text">2. Probabilistic Latent Semantic Analysis</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Orthogonalized_Topic_Model"><span class="toc-number">3.</span> <span class="toc-text">3. Orthogonalized Topic Model</span></a></li></ol>
 		
 		</div>
 		
-		<p><a href="http://iamtrask.github.io/2015/07/12/basic-python-network/" target="_blank" rel="external">原文章</a><br>看到这个11行搞定Neural Netwok的Python代码，禁不住转了过来，就喜欢这种短小精悍却又思路清晰的Code，直接上代码：<br><a id="more"></a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">X = np.array([[<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>], [<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>], [<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>], [<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>]])</span><br><span class="line">y = np.array([[<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>]]).T</span><br><span class="line">syn0 = <span class="number">2</span> * np.random.random((<span class="number">3</span>, <span class="number">4</span>)) - <span class="number">1</span></span><br><span class="line">syn1 = <span class="number">2</span> * np.random.random((<span class="number">4</span>, <span class="number">1</span>)) - <span class="number">1</span></span><br><span class="line"><span class="keyword">for</span> j <span class="keyword">in</span> xrange(<span class="number">6000</span>):</span><br><span class="line">	l1 = <span class="number">1</span> / (<span class="number">1</span> + np.exp(-(np.dot(X, syn0))))</span><br><span class="line">	l2 = <span class="number">1</span> / (<span class="number">1</span> + np.exp(-(np.dot(l1, syn1))))</span><br><span class="line">	l2_delta = (y - l2) * (l2 * (<span class="number">1</span> - l2))</span><br><span class="line">	l1_delta = l2_delta.dot(syn1.T) * (l1 * (<span class="number">1</span> - l1))</span><br><span class="line">	syn1 += l1.T.dot(l2_delta)</span><br><span class="line">	syn0 += X.T.dot(l1_delta)</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li><strong>这个NN的功能是实现异或操作</strong></li>
-<li>4个训练样本，3维，最后一维是 <code>bias</code>，输入始终为1；</li>
-<li>网络结构是 <code>(3-4-1)</code>，激活函数是 <code>sigmoid</code> 函数，最后的输出节点也使用了激活函数，有时候最后的输出不再进行变换，error的计算会有些不同；</li>
-<li><code>syn0</code> 是输入层到隐层节点的权重矩阵，<code>syn1</code> 是隐层到输出层的权重矩阵，<code>l1</code>是隐层节点的 <code>sigmoid</code> 输出，<code>l2</code> 就是预测结果；</li>
-<li><code>l2_delta</code> 是在对 <code>np.dot(l1, syn1)</code> 求导，其中<code>(l2 * (1 - l2))</code> 来自 <code>sigmoid</code>，<code>l1_delta</code> 是在对 <code>np.dot(X, syn0)</code> 求导；</li>
-<li><code>l1.T.dot(l2_delta)</code> 是对 <code>syn1</code> 求导，<code>X.T.dot(l1_delta)</code> 是对 <code>syn0</code> 求导，因为 <code>syn0</code> 和 <code>X</code> 是一个dot操作，所以求导的时候就直接剩下 <code>X</code> 这个系数了。</li>
-</ul>
-<p>代码很简练，可能不直观的地方在于那几次转置，画画图就好了，简记。</p>
+		<p>论文：<a href="http://www.cs.cmu.edu/afs/cs/Web/People/gzheng/papers/p907-yao.pdf" target="_blank" rel="external">Probabilistic Text Modeling with Orthogonalized Topics</a><br>以往的主题模型都是强调文档-主题的分布，很少关心主题-词的分布，论文提出一种OTM(Orthogonalized Topic Model)模型，增加对主题-词分布的正交约束，使用EM算法来求解。<br><a id="more"></a></p>
+<h3 id="1-_Latent_Semantic_Analysis">1. <strong>Latent Semantic Analysis</strong></h3><p>$X \in R^{N \times M}$, N是单词个数，M是文档数，通过SVD分解，$X \approx U \Sigma V^T$，其中U和V都是正交单位矩阵，对应着单词和文档在主题空间中的分布；注意这里主题-单词向量是正交的！</p>
+<h3 id="2-_Probabilistic_Latent_Semantic_Analysis">2. <strong>Probabilistic Latent Semantic Analysis</strong></h3><p>PLSA定义了一个文档集的生成模型：<br> a. select a document $d_i$ with probability $P(d_i)$<br> b. pick a latent topic $z_k$ with probability $P(z_k|d_i)$<br> c. generate a word $w_j$ with the probability $P(w_j|z_k)$<br>$$P(d_i, w_j) = P(d_i) P(w_j|d_i) = P(d_i) \sum_{k=1}^{K} P(w_j|z_k)P(z_k|d_i)$$<br>在给定$z_k$的情况下，$w_j$和$d_i$独立，于是整个数据集的log-likelihood为：<br>$$L = \sum_{i=1}^{M} \sum_{j=1}^{N} n(d_i, w_j) log(P(d_i) \sum_{k=1}^{K} P(w_j|z_k)P(z_k|d_i))$$<br>其中$n(d_i, w_j)$表示单词$w_j$在文档$d_i$中出现的次数，于是我们可以求出$P(w_j|z_k)$和$P(z_k|d_i)$，这样PLSA就赋予文档-主题和主题-单词一个具有统计意义的值，但同时它丢失了LSA中保持的正交性。</p>
+<h3 id="3-_Orthogonalized_Topic_Model">3. <strong>Orthogonalized Topic Model</strong></h3><p>3.1 <strong>Orthogonality Measure</strong><br>作者使用如下公式来度量正交性，或者说是通过最小化主题-单词两两之间的内积来作为正交化的约束：<br>$$O = \sum_{k=1}^{K} \sum_{k’=1,k’\neq k}^{K} \sum_{j=1}^{N} P(w_j|z_k)P(w_j|z_{k’})$$</p>
+<p>3.2 <strong>Objective Function of OTM</strong><br>新的目标函数就是似然减去正交约束：<br>\begin{align}<br>Q &amp; = L - \lambda O \\<br>&amp; = \sum_{i=1}^{M} \sum_{j=1}^{N} n(d_i, w_j) log(P(d_i) \sum_{k=1}^{K} P(w_j|z_k)P(z_k|d_i)) \\<br>&amp;  - \lambda \sum_{k=1}^{K} \sum_{k’=1,k’\neq k}^{K} \sum_{j=1}^{N} P(w_j|z_k)P(w_j|z_{k’}) \\<br>&amp; s.t. \sum_{k=1}^{K} P(z_k|d_i) = 1; \sum_{j=1}^{N} P(w_j|z_k) = 1<br>\end{align}</p>
+<p>$\lambda \geq 0$，如果 $\lambda = 0$就成了PLSA。</p>
+<p>3.3 <strong>Model Fitting with EM</strong><br><strong>a. E-step</strong><br>和PLSA一样，计算隐变量后验概率的期望：<br>$$P(z_k|d_i,w_j) = \frac{P(z_k|d_i)P(w_j|z_k)}{\sum_{k’=1}^{K} P(z_{k’}|d_i) P(w_j|z_{k’})}$$<br><strong>b. M-step</strong><br>利用E步中所求的$P(z_k|d_i,w_j)$，最大化目标函数，求出:<br>$$P(z_k|d_i) = \frac{\sum_{j=1}^{N} n(d_i,w_j)P(z_k|d_i,w_j)}{\sum_{j=1}^{N} n(d_i,w_j)}$$<br>这一步和PLSA一样，因为正交约束不涉及$P(z_k|d_i)$，下面求$P(w_j|z_k)$:<br>\begin{align}<br>\frac{\partial Q}{\partial P(w_j|z_k)} &amp; = \frac{\sum_{i=1}^{M} n(d_i,w_j)P(z_k|d_i,w_j)}{P(w_j|z_k)} - \lambda \sum_{k’=1,k’ \neq k}^{K} P(w_j|z_{k’}) - \alpha_k \\<br>&amp; = 0<br>\end{align}<br>$\alpha_k \geqslant 0$是主题k对应的拉格朗日乘子，所以：<br>$$P(w_j|z_k) = \frac{\sum_{i=1}^{M} n(d_i,w_j)P(z_k|d_i,w_j)}{\alpha_k + \lambda \sum_{k’=1,k’ \neq k}^{K} P(w_j|z_{k’})}$$<br>再根据$\sum_{j=1}^{N} P(w_j|z_k) = 1$可得：<br>$$\sum_{j=1}^{N} \frac{\sum_{i=1}^{M} n(d_i,w_j)P(z_k|d_i,w_j)}{\alpha_k + \lambda \sum_{k’=1,k’ \neq k}^{K} P(w_j|z_{k’})} = 1$$<br>但这个不好解，我们用数值方法来近似求解，利用Newton-Raphson方法:<br>$$\alpha_{k}^{n+1} = \alpha_{k}^{n} - \frac{f_{k}^{‘}(\alpha_{k}^{n})}{f_{k}(\alpha_{k}^{n})}$$<br>$$f_k(x) = \sum_{j=1}^{N} \frac{\sum_{i=1}^{M} n(d_i,w_j)P(z_k|d_i,w_j)}{x + \lambda \sum_{k’=1,k’ \neq k}^{K} P(w_j|z_{k’})} - 1$$<br>通过几轮迭代可以得到一个稳定的$\alpha$，这里的$\alpha$只有一个最优解，所以和初始值关系不大，$alpha$收敛后再带入求解出$P(w_j|z_k)$</p>
+<p>这篇论文短小精悍，出发点比较新，添加主题-单词的正交约束，论文里的实验效果比PLSA好，具体可详见原文。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -117,7 +115,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/ml/">ml</a><a href="/tags/python/">python</a>
+  <span></span> <a href="/tags/ml/">ml</a><a href="/tags/note/">note</a>
   </div>
 
 </div>
@@ -126,7 +124,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://muye5.github.io/2015/07/20/Neural-Network-in-11-Python-Code/" data-title="Neural Network in 11 Python Code | Muye Note" data-tsina="null" class="share clearfix">
+	  <div data-url="http://muye5.github.io/2016/02/26/Probabilistic-Text-Modeling-with-Orthogonalized-Topics/" data-title="Probabilistic Text Modeling with Orthogonalized Topics | Muye Note" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -139,19 +137,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/08/23/A-Note-on-the-EM/" title="A Note on the EM">
-  <strong>上一篇：</strong><br/>
-  <span>
-  A Note on the EM</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/06/29/Digit-Recognizer-II/"  title="Digit Recognizer-II">
+<a href="/2016/02/26/PCA-on-Multimodel-Data/"  title="PCA on Multimodel Data">
  <strong>下一篇：</strong><br/> 
- <span>Digit Recognizer-II
+ <span>PCA on Multimodel Data
 </span>
 </a>
 </div>
@@ -166,7 +156,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目錄</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Latent_Semantic_Analysis"><span class="toc-number">1.</span> <span class="toc-text">1. Latent Semantic Analysis</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Probabilistic_Latent_Semantic_Analysis"><span class="toc-number">2.</span> <span class="toc-text">2. Probabilistic Latent Semantic Analysis</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Orthogonalized_Topic_Model"><span class="toc-number">3.</span> <span class="toc-text">3. Orthogonalized Topic Model</span></a></li></ol>
  
   </div>
 
@@ -432,6 +422,35 @@ $(document).ready(function(){
 
 <!-- MathJax Begin -->
 <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 
 <!-- MathJax End -->
